@@ -39,6 +39,8 @@ DEFINE_string(input_video_path, "",
 DEFINE_string(output_video_path, "",
               "Full path of where to save result (.mp4 only). "
               "If not provided, show result in a window.");
+DEFINE_int32(rotate, -1,
+              "Rotate of image");
 
 ::mediapipe::Status RunMPPGraph() {
   std::string calculator_graph_config_contents;
@@ -91,6 +93,9 @@ DEFINE_string(output_video_path, "",
     cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGB);
     if (!load_video) {
       cv::flip(camera_frame, camera_frame, /*flipcode=HORIZONTAL*/ 1);
+    }
+    if(FLAGS_rotate >= 0){
+      cv::rotate(camera_frame, camera_frame, FLAGS_rotate);
     }
 
     // Wrap Mat into an ImageFrame.
