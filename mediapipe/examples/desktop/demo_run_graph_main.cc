@@ -41,6 +41,12 @@ DEFINE_string(output_video_path, "",
               "If not provided, show result in a window.");
 DEFINE_int32(rotate, -1,
               "Rotate of image");
+DEFINE_string(input_image_folder, "",
+              "Full path of image folder to load. "
+              "If not provided, attempt to use a webcam.");
+DEFINE_string(output_image_folder, "",
+              "Full path of where to save image folder result. "
+              "If not provided, show result in a window.");
 
 ::mediapipe::Status RunMPPGraph() {
   std::string calculator_graph_config_contents;
@@ -58,17 +64,21 @@ DEFINE_int32(rotate, -1,
 
   LOG(INFO) << "Initialize the camera or load the video.";
   cv::VideoCapture capture;
-  const bool load_video = !FLAGS_input_video_path.empty();
+  const bool load_video = !FLAGS_input_video_path.empty() && FLAGS_input_image_folder.empty();
+  const bool load_image_folder = !FLAGS_input_image_folder.empty();
+  std::vector<cv::String> files;
   if (load_video) {
     capture.open(FLAGS_input_video_path);
-  } else {
+  } else if(load_image_folder){
+    cv::glob(FLAGS_input_image_folder, files);
+  } else{
     capture.open(0);
   }
   RET_CHECK(capture.isOpened());
 
   cv::VideoWriter writer;
-  const bool save_video = !FLAGS_output_video_path.empty();
-  if (!save_video) {
+  const bool save_video = !FLAGS_output_video_path.empty() && FLAGS_output_image_folder.empty();
+  if (!save_video && FLAGS_output_image_folder.empty()) {
     cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
 #if (CV_MAJOR_VERSION >= 3) && (CV_MINOR_VERSION >= 2)
     capture.set(cv::CAP_PROP_FRAME_WIDTH, 640);
@@ -84,10 +94,23 @@ DEFINE_int32(rotate, -1,
 
   LOG(INFO) << "Start grabbing and processing frames.";
   bool grab_frames = true;
+  auto file_ptr = files.begin();
   while (grab_frames) {
     // Capture opencv camera or video frame.
+    std::string fname = "";
+    if(load_image_folder){
+      if(file_ptr == files.end())
+        break;
+      fname = *file_ptr;
+      file_ptr++;
+    }
+
     cv::Mat camera_frame_raw;
-    capture >> camera_frame_raw;
+    if(load_image_folder){
+      camera_frame_raw = cv::imread(fname);
+    }else{
+      capture >> camera_frame_raw;
+    }
     if (camera_frame_raw.empty()) break;  // End of video.
     cv::Mat camera_frame;
     cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGB);
