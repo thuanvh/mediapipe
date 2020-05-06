@@ -26,6 +26,13 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 
+std::string basename(const std::string& pathname)
+{
+    return {std::find_if(pathname.rbegin(), pathname.rend(),
+                         [](char c) { return c == '/'; }).base(),
+            pathname.end()};
+}
+
 constexpr char kInputStream[] = "input_video";
 constexpr char kOutputStream[] = "output_video";
 constexpr char kWindowName[] = "MediaPipe";
@@ -74,11 +81,13 @@ DEFINE_string(output_image_folder, "",
   } else{
     capture.open(0);
   }
-  RET_CHECK(capture.isOpened());
+  if(!load_image_folder)
+    RET_CHECK(capture.isOpened());
 
   cv::VideoWriter writer;
   const bool save_video = !FLAGS_output_video_path.empty() && FLAGS_output_image_folder.empty();
-  if (!save_video && FLAGS_output_image_folder.empty()) {
+  const bool save_image = !FLAGS_output_image_folder.empty() && FLAGS_output_video_path.empty();
+  if (!save_video && !save_image) {
     cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
 #if (CV_MAJOR_VERSION >= 3) && (CV_MINOR_VERSION >= 2)
     capture.set(cv::CAP_PROP_FRAME_WIDTH, 640);
@@ -103,6 +112,7 @@ DEFINE_string(output_image_folder, "",
         break;
       fname = *file_ptr;
       file_ptr++;
+      LOG(INFO) << "Process " << fname;
     }
 
     cv::Mat camera_frame_raw;
@@ -152,6 +162,9 @@ DEFINE_string(output_image_folder, "",
         RET_CHECK(writer.isOpened());
       }
       writer.write(output_frame_mat);
+    } else if(save_image){
+      auto bname = basename(fname);
+      cv::imwrite(FLAGS_output_image_folder + "//" + bname + ".jpg", output_frame_mat);
     } else {
       cv::imshow(kWindowName, output_frame_mat);
       // Press any key to exit.
