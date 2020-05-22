@@ -168,7 +168,8 @@ new_local_repository(
 new_local_repository(
     name = "windows_opencv",
     build_file = "@//third_party:opencv_windows.BUILD",
-    path = "C:\\opencv\\build",
+    #path = "C:\\opencv\\build",
+    path = "D:\\Projects\\VirtualMakeover\\External\\opencv",
 )
 
 http_archive(
