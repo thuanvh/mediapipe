@@ -29,7 +29,7 @@
 std::string basename(const std::string& pathname)
 {
     return {std::find_if(pathname.rbegin(), pathname.rend(),
-                         [](char c) { return c == '/'; }).base(),
+                         [](char c) { return c == '/' || c=='\\'; }).base(),
             pathname.end()};
 }
 
@@ -163,9 +163,11 @@ DEFINE_string(output_image_folder, "",
       }
       writer.write(output_frame_mat);
     } else if(save_image){
+      LOG(INFO) << "Save image to ." << FLAGS_output_image_folder;
       auto bname = basename(fname);
       cv::imwrite(FLAGS_output_image_folder + "//" + bname + ".jpg", output_frame_mat);
     } else {
+      LOG(INFO) << "Show image .";
       cv::imshow(kWindowName, output_frame_mat);
       // Press any key to exit.
       const int pressed_key = cv::waitKey(5);
