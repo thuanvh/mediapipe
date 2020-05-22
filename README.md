@@ -1,11 +1,7 @@
 ![MediaPipe](mediapipe/docs/images/mediapipe_small.png?raw=true "MediaPipe logo")
 =======================================================================
 
-[MediaPipe](http://mediapipe.dev) is a framework for building multimodal (eg. video, audio, any time series data), cross platform (i.e Android, iOS, web, edge devices) applied ML pipelines. With MediaPipe, a perception pipeline can be built as a graph of modular components, including, for instance, inference models (e.g., TensorFlow, TFLite) and media processing functions.
-
-![Real-time Face Detection](mediapipe/docs/images/realtime_face_detection.gif)
-
-> "<em>MediaPipe has made it extremely easy to build our 3D person pose reconstruction demo app, facilitating accelerated neural network inference on device and synchronization of our result visualization with the video capture stream. Highly recommended!</em>" - George Papandreou, CTO, [Ariel AI](https://arielai.com)
+[MediaPipe](http://mediapipe.dev) is the simplest way for researchers and developers to build world-class ML solutions and applications for mobile, edge, cloud and the web.
 
 ## ML Solutions in MediaPipe
 
@@ -37,8 +33,6 @@ Follow these [instructions](mediapipe/docs/install.md).
 
 ## Getting started
 See mobile, desktop, web and Google Coral [examples](mediapipe/docs/examples.md).
-
-Check out some web demos [[Edge detection]](https://viz.mediapipe.dev/runner/demos/edge_detection/edge_detection.html) [[Face detection]](https://viz.mediapipe.dev/runner/demos/face_detection/face_detection.html) [[Hand Tracking]](https://viz.mediapipe.dev/runner/demos/hand_tracking/hand_tracking.html)
 
 ## Documentation
 [MediaPipe Read-the-Docs](https://mediapipe.readthedocs.io/) or [docs.mediapipe.dev](https://docs.mediapipe.dev)
@@ -76,7 +70,9 @@ Search MediaPipe Github repository using [Google Open Source code search](https:
 * [Google Industry Workshop at ICIP 2019](http://2019.ieeeicip.org/?action=page4&id=14#Google) [Presentation](https://docs.google.com/presentation/d/e/2PACX-1vRIBBbO_LO9v2YmvbHHEt1cwyqH6EjDxiILjuT0foXy1E7g6uyh4CesB2DkkEwlRDO9_lWfuKMZx98T/pub?start=false&loop=false&delayms=3000&slide=id.g556cc1a659_0_5) on Sept 24 in Taipei, Taiwan
 * [Open sourced at CVPR 2019](https://sites.google.com/corp/view/perception-cv4arvr/mediapipe) on June 17~20 in Long Beach, CA
 
-## Community forum
+## Community
+*  [Awesome MediaPipe: curation of code related to MediaPipe](https://mediapipe.org)
+*  [Slack community for MediaPipe users](https://mediapipe.slack.com)
 *  [Discuss](https://groups.google.com/forum/#!forum/mediapipe) - General community discussion around MediaPipe
 
 ## Alpha Disclaimer
