@@ -1,6 +1,6 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
-
+#define _MEDIAPIPE_LIB_EXPORT_
 #include "mp_export.h"
 
 

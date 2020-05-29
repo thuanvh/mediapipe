@@ -74,7 +74,8 @@ class MPFaceDetectionImpl
   return ::mediapipe::OkStatus();
 }
 
-::mediapipe::Status MPFaceDetectionImpl::detect(cv::Mat camera_frame_raw, std::vector<cv::Rect>& detection_result){
+::mediapipe::Status MPFaceDetectionImpl::detect(cv::Mat camera_frame_raw, std::vector<cv::Rect>& detection_result)
+{
   LOG(INFO) << "Start running the calculator graph.";  
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
                    graph.AddOutputStreamPoller(kOutputStream));

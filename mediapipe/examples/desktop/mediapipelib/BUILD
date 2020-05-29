@@ -27,23 +27,41 @@ cc_library(
     ],
 )
 
+# cc_binary(
+#     name = "mediapipe.dll",
+#     defines = ["_MEDIAPIPE_LIB_EXPORT_"],
+#     deps = [
+#         #"//mediapipe/examples/desktop:demo_run_graph_main",
+#         "//mediapipe/graphs/face_detection:desktop_tflite_calculators",
+#         ":mediapipelib_static",
+#     ],
+#     linkshared = 1,
+#     #linkstatic = 1,
+# )
+cc_library(
+    name = "mediapipe_header",
+    hdrs = ["mp_face_detection.h", "mp_export.h"],
+    visibility = ["//visibility:public"],
+)
 cc_binary(
     name = "mediapipe.dll",
+    srcs = ["mp_face_detection.cc"],
     defines = ["_MEDIAPIPE_LIB_EXPORT_"],
     deps = [
-        #"//mediapipe/examples/desktop:demo_run_graph_main",
+        "//mediapipe/examples/desktop:demo_run_graph_main",
         "//mediapipe/graphs/face_detection:desktop_tflite_calculators",
-        ":mediapipelib_static",
+        ":mediapipe_header",
+        #":mediapipelib_static",
     ],
     linkshared = 1,
-    linkstatic = 1,
+    #linkstatic = 1,
 )
 
 cc_import(
   name = "mediapipe_shared",
   hdrs = ["mp_face_detection.h", "mp_export.h"],
   shared_library = "mediapipe.dll",
-  #interface_library = "mediapipe.dll", 
+  interface_library = "mediapipe.lib", 
 )
 
 cc_binary(
