@@ -47,6 +47,7 @@ namespace mediapipe {
 ::mediapipe::Status GetResourceContents(const std::string& path,
                                         std::string* output);
 
+void SetResourceBasePath(const std::string& path);
 }  // namespace mediapipe
 
 #endif  // MEDIAPIPE_UTIL_RESOURCE_UTIL_H_

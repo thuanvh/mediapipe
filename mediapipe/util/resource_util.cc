@@ -15,18 +15,32 @@
 #include "mediapipe/util/resource_util.h"
 
 #include "mediapipe/framework/port/file_helpers.h"
+namespace 
+{
+  std::string resource_base_path = "";
+} // namespace 
 
 namespace mediapipe {
 
 // Trivial implementation for Linux. For now just returns the path.
 ::mediapipe::StatusOr<std::string> PathToResourceAsFile(
     const std::string& path) {
+  const size_t star_idx = path.find_first_of("[BASEPATH]");
+  if(star_idx != std::string::npos)
+  {
+    std::string str=path;
+    return str.replace(star_idx, 10, resource_base_path);
+  }
   return path;
 }
 
 ::mediapipe::Status GetResourceContents(const std::string& path,
                                         std::string* output) {
   return mediapipe::file::GetContents(path, output);
+}
+
+void SetResourceBasePath(const std::string& path){
+  resource_base_path = path;
 }
 
 }  // namespace mediapipe

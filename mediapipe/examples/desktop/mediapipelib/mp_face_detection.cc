@@ -27,6 +27,7 @@
 #include "mediapipe/framework/port/status.h"
 #include "mediapipe/framework/formats/detection.pb.h"
 #include "mediapipe/framework/formats/location_data.pb.h"
+#include "mediapipe/util/resource_util.h"
 
 #include "mp_face_detection.h"
 
@@ -48,7 +49,7 @@ class MPFaceDetectionImpl
   MPFaceDetectionImpl(){}
   MPFaceDetectionImpl(MPFaceDetectionImpl &&){}
 
-  ::mediapipe::Status init(std::string calculator_graph_config_file);
+  ::mediapipe::Status init(const std::string& calculator_graph_config_file);
   ::mediapipe::Status detect(cv::Mat camera_frame_raw, std::vector<cv::Rect>& detection_result);
   ::mediapipe::Status close();
   
@@ -57,7 +58,7 @@ class MPFaceDetectionImpl
   cv::Rect GetLocation(const mediapipe::Detection& detection, int width, int height);
 };
 
-::mediapipe::Status MPFaceDetectionImpl::init(std::string calculator_graph_config_file)
+::mediapipe::Status MPFaceDetectionImpl::init(const std::string& calculator_graph_config_file)
 {
   std::string calculator_graph_config_contents;
   MP_RETURN_IF_ERROR(mediapipe::file::GetContents(
@@ -148,7 +149,7 @@ cv::Rect MPFaceDetectionImpl::GetLocation(const mediapipe::Detection& detection,
   }
   return cv::Rect(0,0,0,0);
 }
-bool MPFaceDetection::Init(std::string calculator_graph_config_file){
+bool MPFaceDetection::Init(const std::string& calculator_graph_config_file){
   impl = new MPFaceDetectionImpl();
   ((MPFaceDetectionImpl*)impl)->init(calculator_graph_config_file);
   return true;
@@ -163,4 +164,9 @@ std::vector<cv::Rect> MPFaceDetection::Detect(cv::Mat img){
 void MPFaceDetection::Exit(){
   ((MPFaceDetectionImpl*)impl)->close();
   delete ((MPFaceDetectionImpl*)impl);
+}
+
+
+void MPEnv::SetResourceEnv(const std::string& env){
+  mediapipe::SetResourceBasePath(env);
 }
