@@ -1,0 +1,3 @@
+LIBRARY   mediapipe_lib
+EXPORTS
+   main_mpp_graph   @1
