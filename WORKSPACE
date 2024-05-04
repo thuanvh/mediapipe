@@ -397,7 +397,8 @@ new_local_repository(
 new_local_repository(
     name = "windows_opencv",
     build_file = "@//third_party:opencv_windows.BUILD",
-    path = "C:\\opencv\\build",
+    path = "C:\\Projects\\VM\\opencv-4.9.0\\install\\opencv\\build",
+    #path = "C:\\Projects\\VM\\opencv-3.4.10\\opencv\\build",
 )
 
 http_archive(
@@ -545,9 +546,6 @@ http_archive(
         # Works around Bazel issue with objc_library.
         # See https://github.com/bazelbuild/bazel/issues/19912
         "@//third_party:org_tensorflow_objc_build_fixes.diff",
-        # Restores scores for text pipelines, which return different results
-        # with subgraph reshaping
-        "@//third_party:org_tensorflow_disable_subgraph_reshaping.diff"
     ],
     patch_args = [
         "-p1",

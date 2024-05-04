@@ -39,7 +39,7 @@ cc_library(
 
 cc_library(
     name = "image_inference_tflite",
-    srcs = ["ImageInferenceTflite.cpp","ImageInferenceTflite.h","caffecnncommon.h"],
+    srcs = ["ImageInferenceTflite.cpp","ImageInferenceTflite.h","MediapipeLibExport.h"],
     deps = [
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/formats:image_frame",
