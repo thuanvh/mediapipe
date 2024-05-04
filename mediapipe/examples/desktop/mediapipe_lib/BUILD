@@ -36,11 +36,44 @@ cc_library(
     ],
 )
 
+
+cc_library(
+    name = "image_inference_tflite",
+    srcs = ["ImageInferenceTflite.cpp","ImageInferenceTflite.h","caffecnncommon.h"],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/formats:image_frame_opencv",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:opencv_highgui",
+        "//mediapipe/framework/port:opencv_imgproc",
+        "//mediapipe/framework/port:opencv_video",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+        "//mediapipe/util:resource_util",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/log:absl_log",
+        "@org_tensorflow//tensorflow/lite:framework",
+        "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
+        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
+    ],
+    defines = ["_MEDIAPIPE_LIB_EXPORT_"],
+)
+
+cc_binary(
+    name = "image_inference_tflite_test",
+    srcs = ["ImageInferenceTfliteTest.cpp"],
+    deps = [
+        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+    ],
+)
 cc_shared_library(
     name = "mediapipe_lib_tflite",
     #data = ["//mediapipe/modules/face_landmark:face_landmark_with_attention.tflite"],
     deps = [
         "//mediapipe/examples/desktop/mediapipe_lib:simple_run_graph_lib",
+        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
         "//mediapipe/graphs/face_mesh:desktop_calculators",
     ],
 )
@@ -51,6 +84,7 @@ cc_shared_library(
     #data = ["//mediapipe/modules/face_landmark:face_landmark_with_attention.tflite"],
     deps = [
         "//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_lib",
+        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
         "//mediapipe/graphs/face_mesh:desktop_live_calculators",
     ],
     exports_filter = ["//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_lib",],
