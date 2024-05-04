@@ -1,4 +1,4 @@
-#include "ImageRegressionTF.h"
+#include "ImageInferenceTflite.h"
 // #include "VirtualMakeover/utility/StringUtils.h"
 #include <fstream>
 #include <vector>
