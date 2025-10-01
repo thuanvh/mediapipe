@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -23,6 +25,7 @@ objc_library(
     deps = [
         "//mediapipe/tasks/ios/components/containers:MPPClassificationResult",
         "//mediapipe/tasks/ios/core:MPPTaskResult",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -34,6 +37,7 @@ objc_library(
         ":MPPImageClassifierResult",
         "//mediapipe/tasks/ios/core:MPPTaskOptions",
         "//mediapipe/tasks/ios/vision/core:MPPRunningMode",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -43,7 +47,8 @@ objc_library(
     hdrs = ["sources/MPPImageClassifier.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     module_name = "MPPImageClassifier",
@@ -60,5 +65,6 @@ objc_library(
         "//mediapipe/tasks/ios/vision/core:MPPVisionTaskRunner",
         "//mediapipe/tasks/ios/vision/image_classifier/utils:MPPImageClassifierOptionsHelpers",
         "//mediapipe/tasks/ios/vision/image_classifier/utils:MPPImageClassifierResultHelpers",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

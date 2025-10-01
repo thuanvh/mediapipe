@@ -34,6 +34,7 @@
 #include "mediapipe/framework/port/gtest.h"
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status_matchers.h"
+#include "mediapipe/framework/resources.h"
 #include "mediapipe/framework/tool/sink.h"
 #include "mediapipe/util/tflite/tflite_model_loader.h"
 #include "tensorflow/lite/interpreter.h"
@@ -45,13 +46,13 @@ namespace {
 
 // Signature of 3in3out_model_swaps_input_2_and_0.tflite model:
 // ~~~~~~~~~~ INPUTS ~~~~~~~~~~
-// 0 :  third_input :  [1 3] :  F32
+// 0 :  third_input :  [1 1] :  F32
 // 1 :  first_input :  [1 1] :  F32
-// 2 :  second_input :  [1 2] :  F32
+// 2 :  second_input :  [1 1] :  F32
 // ~~~~~~~~~~ OUTPUTS ~~~~~~~~~
-// 0 :  output_1 :  [1 2] :  F32
+// 0 :  output_1 :  [1 1] :  F32
 // 1 :  output_0 :  [1 1] :  F32
-// 2 :  output_2 :  [1 3] :  F32
+// 2 :  output_2 :  [1 1] :  F32
 constexpr char k3In3OutSwaps2And0ModelPath[] =
     "mediapipe/calculators/tensor/testdata/"
     "3in3out_model_swaps_input_2_and_0.tflite";
@@ -309,8 +310,10 @@ class InferenceCalculatorIoMapTestWithParams
     : public ::testing::TestWithParam<InputOutputExpectedOrderTestConfig> {
  protected:
   void SetUp() override {
+    std::unique_ptr<Resources> resources = CreateDefaultResources();
     MP_ASSERT_OK_AND_ASSIGN(
-        model_, TfLiteModelLoader::LoadFromPath(k3In3OutSwaps2And0ModelPath));
+        model_, TfLiteModelLoader::LoadFromPath(*resources,
+                                                k3In3OutSwaps2And0ModelPath));
     InterpreterBuilder(
         *model_.Get(),
         BuiltinOpResolverWithoutDefaultDelegates())(&interpreter_);
@@ -359,8 +362,7 @@ TEST_P(InferenceCalculatorIoMapTestWithParams,
 
 INSTANTIATE_TEST_SUITE_P(
     InferenceCalculatorIoMapTestSuiteInitialization,
-    InferenceCalculatorIoMapTestWithParams,  // This is the name of your
-                                             // parameterized test
+    InferenceCalculatorIoMapTestWithParams,
     testing::ValuesIn(GetInputOutputExpectedOrderTestConfigs()),
     [](const testing::TestParamInfo<
         InferenceCalculatorIoMapTestWithParams::ParamType>& info) {
@@ -370,8 +372,10 @@ INSTANTIATE_TEST_SUITE_P(
 class InferenceIoMapperTest : public ::testing::Test {
  protected:
   void SetUp() override {
+    std::unique_ptr<Resources> resources = CreateDefaultResources();
     MP_ASSERT_OK_AND_ASSIGN(
-        model_, TfLiteModelLoader::LoadFromPath(k3In3OutSwaps2And0ModelPath));
+        model_, TfLiteModelLoader::LoadFromPath(*resources,
+                                                k3In3OutSwaps2And0ModelPath));
     InterpreterBuilder(
         *model_.Get(),
         BuiltinOpResolverWithoutDefaultDelegates())(&interpreter_);
@@ -453,11 +457,9 @@ TEST_F(InferenceIoMapperTest, ShouldReportTooFewInputMappingIndices) {
       InferenceIoMapper::GetInputOutputTensorNamesFromInterpreter(
           *interpreter_));
   MP_EXPECT_OK(mapper.UpdateIoMap(map, input_output_tensor_names));
-  EXPECT_THAT(
-      mapper.RemapInputTensors(MakeTensorSpan(input_tensors_unmapped)),
-      StatusIs(
-          absl::StatusCode::kInternal,
-          HasSubstr("Number of input tensors does not match number indices")));
+  EXPECT_THAT(mapper.RemapInputTensors(MakeTensorSpan(input_tensors_unmapped)),
+              StatusIs(absl::StatusCode::kInternal,
+                       HasSubstr("Unexpected number of input tensors")));
 }
 
 TEST_F(InferenceIoMapperTest, ShouldReportTooFewOutputMappingIndices) {
@@ -480,11 +482,9 @@ TEST_F(InferenceIoMapperTest, ShouldReportTooFewOutputMappingIndices) {
       InferenceIoMapper::GetInputOutputTensorNamesFromInterpreter(
           *interpreter_));
   MP_EXPECT_OK(mapper.UpdateIoMap(map, input_output_tensor_names));
-  EXPECT_THAT(
-      mapper.RemapOutputTensors(std::move(output_tensors_unmapped)),
-      StatusIs(
-          absl::StatusCode::kInternal,
-          HasSubstr("Number of output tensors does not match number indices")));
+  EXPECT_THAT(mapper.RemapOutputTensors(std::move(output_tensors_unmapped)),
+              StatusIs(absl::StatusCode::kInternal,
+                       HasSubstr("Unexpected number of output tensors")));
 }
 
 TEST_F(InferenceIoMapperTest, ShouldReportTooManyMappingInputIndices) {
@@ -509,11 +509,9 @@ TEST_F(InferenceIoMapperTest, ShouldReportTooManyMappingInputIndices) {
       InferenceIoMapper::GetInputOutputTensorNamesFromInterpreter(
           *interpreter_));
   MP_EXPECT_OK(mapper.UpdateIoMap(map, input_output_tensor_names));
-  EXPECT_THAT(
-      mapper.RemapInputTensors(MakeTensorSpan(input_tensors_unmapped)),
-      StatusIs(
-          absl::StatusCode::kInternal,
-          HasSubstr("Number of input tensors does not match number indices")));
+  EXPECT_THAT(mapper.RemapInputTensors(MakeTensorSpan(input_tensors_unmapped)),
+              StatusIs(absl::StatusCode::kInternal,
+                       HasSubstr("Unexpected number of input tensors")));
 }
 
 TEST_F(InferenceIoMapperTest, ShouldReportTooManyMappingOutputIndices) {
@@ -538,11 +536,9 @@ TEST_F(InferenceIoMapperTest, ShouldReportTooManyMappingOutputIndices) {
       InferenceIoMapper::GetInputOutputTensorNamesFromInterpreter(
           *interpreter_));
   MP_EXPECT_OK(mapper.UpdateIoMap(map, input_output_tensor_names));
-  EXPECT_THAT(
-      mapper.RemapOutputTensors(std::move(output_tensors_unmapped)),
-      StatusIs(
-          absl::StatusCode::kInternal,
-          HasSubstr("Number of output tensors does not match number indices")));
+  EXPECT_THAT(mapper.RemapOutputTensors(std::move(output_tensors_unmapped)),
+              StatusIs(absl::StatusCode::kInternal,
+                       HasSubstr("Unexpected number of output tensors")));
 }
 
 TEST_F(InferenceIoMapperTest, ShouldReportDuplicatedMappingIndices) {
@@ -681,8 +677,10 @@ class InferenceIoMapperSmokeTest
           absl::StrCat("input", n),
           MakePacket<Tensor>(std::move(input_tensor)).At(Timestamp(0))));
     }
-    MP_EXPECT_OK(graph.WaitUntilIdle());
+    MP_EXPECT_OK(graph.CloseAllInputStreams());
+    MP_EXPECT_OK(graph.WaitUntilDone());
 
+    EXPECT_EQ(output_packets.size(), expected_order.size());
     for (int i = 0; i < output_packets.size(); ++i) {
       EXPECT_EQ(output_packets[i].size(), 1);
       const auto read_view =
@@ -717,8 +715,10 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST(InferenceIoMapper,
      ShouldIgnoreMultiSignatureChecksWhenNoNameBasedMapConfigExists) {
-  MP_ASSERT_OK_AND_ASSIGN(const auto model, TfLiteModelLoader::LoadFromPath(
-                                                kTwoSignaturesModelPath));
+  std::unique_ptr<Resources> resources = CreateDefaultResources();
+  MP_ASSERT_OK_AND_ASSIGN(
+      const auto model,
+      TfLiteModelLoader::LoadFromPath(*resources, kTwoSignaturesModelPath));
   std::unique_ptr<tflite::Interpreter> interpreter;
   InterpreterBuilder(*model.Get(),
                      BuiltinOpResolverWithoutDefaultDelegates())(&interpreter);
@@ -733,8 +733,10 @@ TEST(InferenceIoMapper,
 }
 
 TEST(InferenceIoMapper, ShouldFailWhenMultipleSignaturesExist) {
-  MP_ASSERT_OK_AND_ASSIGN(const auto model, TfLiteModelLoader::LoadFromPath(
-                                                kTwoSignaturesModelPath));
+  std::unique_ptr<Resources> resources = CreateDefaultResources();
+  MP_ASSERT_OK_AND_ASSIGN(
+      const auto model,
+      TfLiteModelLoader::LoadFromPath(*resources, kTwoSignaturesModelPath));
   std::unique_ptr<tflite::Interpreter> interpreter;
   InterpreterBuilder(*model.Get(),
                      BuiltinOpResolverWithoutDefaultDelegates())(&interpreter);

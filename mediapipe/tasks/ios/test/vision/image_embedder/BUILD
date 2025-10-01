@@ -17,12 +17,11 @@ load(
     "@org_tensorflow//tensorflow/lite:special_rules.bzl",
     "tflite_ios_lab_runner",
 )
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
 load(
     "//mediapipe/framework/tool:ios.bzl",
     "MPP_TASK_MINIMUM_OS_VERSION",
 )
-
-package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
 
@@ -40,11 +39,12 @@ TFL_DISABLED_SANITIZER_TAGS = [
 
 objc_library(
     name = "MPPImageEmbedderObjcTestLibrary",
-    testonly = 1,
+    testonly = True,
     srcs = ["MPPImageEmbedderTests.mm"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     data = [
@@ -57,6 +57,8 @@ objc_library(
         "//mediapipe/tasks/ios/test/vision/utils:MPPImageTestUtils",
         "//mediapipe/tasks/ios/vision/image_embedder:MPPImageEmbedder",
         "//mediapipe/tasks/ios/vision/image_embedder:MPPImageEmbedderResult",
+        "//third_party/apple_frameworks:Foundation",
+        "//third_party/apple_frameworks:XCTest",
     ] + select({
         "//third_party:opencv_ios_sim_arm64_source_build": ["@ios_opencv_source//:opencv_xcframework"],
         "//third_party:opencv_ios_arm64_source_build": ["@ios_opencv_source//:opencv_xcframework"],

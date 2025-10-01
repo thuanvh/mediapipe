@@ -32,7 +32,7 @@ export declare interface WebGpuOptions {
 
   // TODO: b/327685206 - Fill Adapter infor for LLM Web task
   /**
-   * The information of WebGPU adapater, which will be used to optimize the
+   * The information of WebGPU adapter, which will be used to optimize the
    * performance for LLM Inference task.
    */
   adapterInfo?: GPUAdapterInfo;
@@ -70,4 +70,40 @@ export declare interface LlmInferenceOptions extends TaskRunnerOptions {
    * Random seed for sampling tokens.
    */
   randomSeed?: number;
+
+  /**
+   * The LoRA ranks that will be used during inference.
+   */
+  loraRanks?: number[];
+
+  /**
+   * The number of responses to generate for 'generateResponses' calls,
+   * defaulting to 1.
+   * In order to ensure variation of responses, you should set topK > 1 and
+   * temperature > 0 in the task options; otherwise sampling will collapse to
+   * greedy sampling, resulting in all generated responses having the same
+   * results.
+   * Also, note that increasing this will slow down `generateResponse` calls,
+   * because it will still generate many responses, even though it only returns
+   * the top result.
+   */
+  numResponses?: number;
+
+  /**
+   * When set to true, will force inference to be performed with F32 precision.
+   * Useful for debugging F16 precision-related errors.
+   */
+  forceF32?: boolean;
+
+  /**
+   * When set > 0, will enable vision modality usage. Will also enable streaming
+   * loading, and therefore is not compatible with "converted" models.
+   */
+  maxNumImages?: number;
+
+  /**
+   * When set to true, will enable audio modality usage. Will also enable
+   * streaming loading, and therefore is not compatible with "converted" models.
+   */
+  supportAudio?: boolean;
 }

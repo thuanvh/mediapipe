@@ -94,14 +94,14 @@ ImageEmbedder* CppImageEmbedderCreate(const ImageEmbedderOptions& options,
             ABSL_LOG(ERROR)
                 << "Embedding extraction failed: " << cpp_result.status();
             CppProcessError(cpp_result.status(), &error_msg);
-            result_callback(nullptr, MpImage(), timestamp, error_msg);
+            result_callback(nullptr, nullptr, timestamp, error_msg);
             free(error_msg);
             return;
           }
 
           // Result is valid for the lifetime of the callback function.
-          ImageEmbedderResult result;
-          CppConvertToEmbeddingResult(*cpp_result, &result);
+          auto result = std::make_unique<ImageEmbedderResult>();
+          CppConvertToEmbeddingResult(*cpp_result, result.get());
 
           const auto& image_frame = image.GetImageFrameSharedPtr();
           const MpImage mp_image = {
@@ -112,10 +112,8 @@ ImageEmbedder* CppImageEmbedderCreate(const ImageEmbedderOptions& options,
                   .width = image_frame->Width(),
                   .height = image_frame->Height()}};
 
-          result_callback(&result, mp_image, timestamp,
+          result_callback(result.release(), &mp_image, timestamp,
                           /* error_msg= */ nullptr);
-
-          CppCloseEmbeddingResult(&result);
         };
   }
 
@@ -257,45 +255,50 @@ int CppImageEmbedderCosineSimilarity(const Embedding& u, const Embedding& v,
 
 extern "C" {
 
-void* image_embedder_create(struct ImageEmbedderOptions* options,
-                            char** error_msg) {
+MP_EXPORT void* image_embedder_create(struct ImageEmbedderOptions* options,
+                                      char** error_msg) {
   return mediapipe::tasks::c::vision::image_embedder::CppImageEmbedderCreate(
       *options, error_msg);
 }
 
-int image_embedder_embed_image(void* embedder, const MpImage* image,
-                               ImageEmbedderResult* result, char** error_msg) {
+MP_EXPORT int image_embedder_embed_image(void* embedder, const MpImage* image,
+                                         ImageEmbedderResult* result,
+                                         char** error_msg) {
   return mediapipe::tasks::c::vision::image_embedder::CppImageEmbedderEmbed(
       embedder, image, result, error_msg);
 }
 
-int image_embedder_embed_for_video(void* embedder, const MpImage* image,
-                                   int64_t timestamp_ms,
-                                   ImageEmbedderResult* result,
-                                   char** error_msg) {
+MP_EXPORT int image_embedder_embed_for_video(void* embedder,
+                                             const MpImage* image,
+                                             int64_t timestamp_ms,
+                                             ImageEmbedderResult* result,
+                                             char** error_msg) {
   return mediapipe::tasks::c::vision::image_embedder::
       CppImageEmbedderEmbedForVideo(embedder, image, timestamp_ms, result,
                                     error_msg);
 }
 
-int image_embedder_embed_async(void* embedder, const MpImage* image,
-                               int64_t timestamp_ms, char** error_msg) {
+MP_EXPORT int image_embedder_embed_async(void* embedder, const MpImage* image,
+                                         int64_t timestamp_ms,
+                                         char** error_msg) {
   return mediapipe::tasks::c::vision::image_embedder::
       CppImageEmbedderEmbedAsync(embedder, image, timestamp_ms, error_msg);
 }
 
-void image_embedder_close_result(ImageEmbedderResult* result) {
+MP_EXPORT void image_embedder_close_result(ImageEmbedderResult* result) {
   mediapipe::tasks::c::vision::image_embedder::CppImageEmbedderCloseResult(
       result);
 }
 
-int image_embedder_close(void* embedder, char** error_msg) {
+MP_EXPORT int image_embedder_close(void* embedder, char** error_msg) {
   return mediapipe::tasks::c::vision::image_embedder::CppImageEmbedderClose(
       embedder, error_msg);
 }
 
-int image_embedder_cosine_similarity(const Embedding& u, const Embedding& v,
-                                     double* similarity, char** error_msg) {
+MP_EXPORT int image_embedder_cosine_similarity(const Embedding& u,
+                                               const Embedding& v,
+                                               double* similarity,
+                                               char** error_msg) {
   return mediapipe::tasks::c::vision::image_embedder::
       CppImageEmbedderCosineSimilarity(u, v, similarity, error_msg);
 }

@@ -15,10 +15,15 @@
 #ifndef MEDIAPIPE_GPU_GL_CALCULATOR_HELPER_H_
 #define MEDIAPIPE_GPU_GL_CALCULATOR_HELPER_H_
 
+#include <functional>
 #include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 #include "absl/base/attributes.h"
 #include "absl/memory/memory.h"
+#include "absl/status/status.h"
 #include "mediapipe/framework/calculator_context.h"
 #include "mediapipe/framework/calculator_contract.h"
 #include "mediapipe/framework/formats/image.h"
@@ -98,8 +103,8 @@ class GlCalculatorHelper {
   //
   // Therefore, instead of using std::function<void(void)>, we use a template
   // that only accepts arguments with a void result type.
-  template <typename T, typename = typename std::enable_if<std::is_void<
-                            typename std::result_of<T()>::type>::value>::type>
+  template <typename T, typename = typename std::enable_if<
+                            std::is_void<std::invoke_result_t<T>>::value>::type>
   void RunInGlContext(T f) {
     RunInGlContext([f] {
       f();
@@ -211,8 +216,8 @@ class GlCalculatorHelper {
 };
 
 // Represents an OpenGL texture, and is a 'view' into the memory pool.
-// It's more like a GlTextureLock, because it's main purpose (in conjunction
-// with the helper): to manage GL sync points in the gl command queue.
+// It's more like a GlTextureLock, because its main purpose (in conjunction
+// with the helper) is: to manage GL sync points in the gl command queue.
 //
 // This class should be the main way to interface with GL memory within a single
 // calculator. This is the preferred way to utilize the memory pool inside of
@@ -260,15 +265,15 @@ class GlTexture {
 // same thing.
 template <typename T>
 ABSL_DEPRECATED("Only for legacy calculators")
-auto TagOrIndex(const T& collection, const std::string& tag,
-                int index) -> decltype(collection.Tag(tag)) {
+auto TagOrIndex(const T& collection, const std::string& tag, int index)
+    -> decltype(collection.Tag(tag)) {
   return collection.UsesTags() ? collection.Tag(tag) : collection.Index(index);
 }
 
 template <typename T>
 ABSL_DEPRECATED("Only for legacy calculators")
-auto TagOrIndex(T* collection, const std::string& tag,
-                int index) -> decltype(collection->Tag(tag)) {
+auto TagOrIndex(T* collection, const std::string& tag, int index)
+    -> decltype(collection->Tag(tag)) {
   return collection->UsesTags() ? collection->Tag(tag)
                                 : collection->Index(index);
 }

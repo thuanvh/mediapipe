@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//mediapipe/framework/port:build_config.bzl", "mediapipe_proto_library")
 
 # Copyright 2019 The MediaPipe Authors.
@@ -145,6 +147,9 @@ cc_library(
     name = "kinematic_path_solver",
     srcs = ["kinematic_path_solver.cc"],
     hdrs = ["kinematic_path_solver.h"],
+    visibility = [
+        "//mediapipe/examples:__subpackages__",
+    ],
     deps = [
         ":kinematic_path_solver_cc_proto",
         "//mediapipe/framework/port:integral_types",

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
@@ -21,4 +23,7 @@ objc_library(
     srcs = ["sources/MPPFileInfo.m"],
     hdrs = ["sources/MPPFileInfo.h"],
     module_name = "MPPFileInfo",
+    deps = [
+        "//third_party/apple_frameworks:Foundation",
+    ],
 )

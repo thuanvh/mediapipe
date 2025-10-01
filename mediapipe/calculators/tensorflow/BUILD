@@ -13,8 +13,11 @@
 # limitations under the License.
 #
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//mediapipe/framework/port:build_config.bzl", "mediapipe_cc_proto_library", "mediapipe_proto_library")
 # Placeholder: load py_proto_library
+# Placeholder: load proto_library
 
 licenses(["notice"])
 
@@ -311,6 +314,10 @@ cc_library(
 cc_library(
     name = "matrix_to_tensor_calculator",
     srcs = ["matrix_to_tensor_calculator.cc"],
+    features = select({
+        "//mediapipe:android": ["-layering_check"],
+        "//conditions:default": [],
+    }),
     deps = [
         ":matrix_to_tensor_calculator_options_cc_proto",
         "//mediapipe/framework:calculator_framework",
@@ -421,6 +428,10 @@ cc_library(
 cc_library(
     name = "tensorflow_inference_calculator_for_boq",
     srcs = ["tensorflow_inference_calculator.cc"],
+    features = select({
+        "//mediapipe:android": ["-layering_check"],
+        "//conditions:default": [],
+    }),
     deps = [
         ":tensorflow_inference_calculator_cc_proto",
         ":tensorflow_session",
@@ -684,6 +695,10 @@ cc_library(
 cc_library(
     name = "tensor_to_matrix_calculator",
     srcs = ["tensor_to_matrix_calculator.cc"],
+    features = select({
+        "//mediapipe:android": ["-layering_check"],
+        "//conditions:default": [],
+    }),
     deps = [
         ":tensor_to_matrix_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
@@ -807,6 +822,7 @@ cc_library(
         "@com_google_absl//absl/log:absl_log",
         "@com_google_absl//absl/status",
         "@org_tensorflow//tensorflow/core:framework",
+        "@org_tensorflow//tensorflow/core:protos_all_cc",
     ],
     alwayslink = 1,
 )
@@ -942,6 +958,7 @@ cc_test(
 cc_test(
     name = "pack_media_sequence_calculator_test",
     srcs = ["pack_media_sequence_calculator_test.cc"],
+    tags = ["nomsan"],  # TestTooLargeInputFailsSoftly runs out of memory in msan.
     deps = [
         ":pack_media_sequence_calculator",
         ":pack_media_sequence_calculator_cc_proto",

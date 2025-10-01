@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -22,7 +24,8 @@ objc_library(
     hdrs = ["sources/MPPImage.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
     ],
     module_name = "MPPImage",
     deps = [
@@ -30,6 +33,7 @@ objc_library(
         "//mediapipe/tasks/ios/common/utils:MPPCommonUtils",
         "//third_party/apple_frameworks:CoreMedia",
         "//third_party/apple_frameworks:CoreVideo",
+        "//third_party/apple_frameworks:Foundation",
         "//third_party/apple_frameworks:UIKit",
     ],
 )
@@ -38,6 +42,7 @@ objc_library(
     name = "MPPRunningMode",
     hdrs = ["sources/MPPRunningMode.h"],
     module_name = "MPPRunningMode",
+    deps = ["//third_party/apple_frameworks:Foundation"],
 )
 
 objc_library(
@@ -46,7 +51,8 @@ objc_library(
     hdrs = ["sources/MPPVisionPacketCreator.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
     ],
     deps = [
         ":MPPImage",
@@ -54,9 +60,11 @@ objc_library(
         "//mediapipe/framework:timestamp",
         "//mediapipe/framework/formats:image",
         "//mediapipe/framework/formats:rect_cc_proto",
+        "//mediapipe/tasks/cc/vision/interactive_segmenter/proto:region_of_interest_cc_proto",
         "//mediapipe/tasks/ios/components/containers:MPPRegionOfInterest",
         "//mediapipe/tasks/ios/components/containers/utils:MPPRegionOfInterestHelpers",
         "//mediapipe/tasks/ios/vision/core/utils:MPPImageUtils",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -66,7 +74,8 @@ objc_library(
     hdrs = ["sources/MPPVisionTaskRunner.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
     ],
     deps = [
         ":MPPImage",
@@ -80,6 +89,7 @@ objc_library(
         "//mediapipe/tasks/ios/common/utils:NSStringHelpers",
         "//mediapipe/tasks/ios/core:MPPTaskInfo",
         "//mediapipe/tasks/ios/core:MPPTaskRunner",
+        "//third_party/apple_frameworks:Foundation",
         "//third_party/apple_frameworks:UIKit",
         "@com_google_absl//absl/status:statusor",
     ],
@@ -91,10 +101,12 @@ objc_library(
     hdrs = ["sources/MPPMask.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
     ],
     deps = [
         "//mediapipe/tasks/ios/common:MPPCommon",
         "//mediapipe/tasks/ios/common/utils:MPPCommonUtils",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

@@ -13,6 +13,8 @@
 # limitations under the License.
 #
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//mediapipe/framework/port:build_config.bzl", "mediapipe_proto_library")
 load(
     "//mediapipe/framework/tool:mediapipe_graph.bzl",
@@ -279,6 +281,9 @@ cc_library(
         "//mediapipe:ios": [
             "//mediapipe/util/android/file/base",
         ],
+        "//mediapipe:emscripten": [
+            "//mediapipe/util/android/file/base",
+        ],
         "//mediapipe:macos": [
             "//mediapipe/framework/port:file_helpers",
         ],
@@ -426,6 +431,7 @@ cc_test(
     copts = ["-DPARALLEL_INVOKER_ACTIVE"] + select({
         "//mediapipe:apple": [],
         "//mediapipe:android": [],
+        "//mediapipe:emscripten": ["-UPARALLEL_INVOKER_ACTIVE"],
         "//conditions:default": [],
     }),
     data = [

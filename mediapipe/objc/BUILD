@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
 load("//mediapipe/framework/tool:mediapipe_graph.bzl", "mediapipe_binary_graph")
 
 package(default_visibility = ["//visibility:private"])
@@ -212,13 +214,13 @@ objc_library(
         "//third_party/apple_frameworks:AVFoundation",
         "//third_party/apple_frameworks:CoreAudio",
         "//third_party/apple_frameworks:CoreMedia",
-        "@eigen_archive//:eigen3",
+        "@eigen//:eigen3",
     ],
 )
 
 objc_library(
     name = "MPPGraphTestBase",
-    testonly = 1,
+    testonly = True,
     srcs = [
         "MPPGraphTestBase.mm",
     ],
@@ -248,7 +250,7 @@ objc_library(
 
 objc_library(
     name = "mediapipe_framework_ios_testLib",
-    testonly = 1,
+    testonly = True,
     srcs = [
         "CFHolderTests.mm",
         "MPPDisplayLinkWeakTargetTests.mm",

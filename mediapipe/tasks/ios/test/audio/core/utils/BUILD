@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
@@ -23,6 +25,32 @@ objc_library(
     deps = [
         "//mediapipe/tasks/ios/audio/core:MPPAudioDataFormat",
         "//mediapipe/tasks/ios/audio/core:MPPFloatBuffer",
+        "//mediapipe/tasks/ios/test/utils:MPPFileInfo",
+        "//third_party/apple_frameworks:AVFoundation",
+        "//third_party/apple_frameworks:Foundation",
+    ],
+)
+
+objc_library(
+    name = "AVAudioFileTestUtils",
+    srcs = ["sources/AVAudioFile+TestUtils.m"],
+    hdrs = ["sources/AVAudioFile+TestUtils.h"],
+    deps = [
+        ":AVAudioPCMBufferTestUtils",
+        "//mediapipe/tasks/ios/audio/core:MPPAudioData",
+        "//mediapipe/tasks/ios/test/utils:MPPFileInfo",
+        "//third_party/apple_frameworks:AVFoundation",
+        "//third_party/apple_frameworks:Foundation",
+    ],
+)
+
+objc_library(
+    name = "MPPAudioDataTestUtils",
+    srcs = ["sources/MPPAudioData+TestUtils.m"],
+    hdrs = ["sources/MPPAudioData+TestUtils.h"],
+    deps = [
+        ":AVAudioPCMBufferTestUtils",
+        "//mediapipe/tasks/ios/audio/core:MPPAudioData",
         "//mediapipe/tasks/ios/test/utils:MPPFileInfo",
     ],
 )

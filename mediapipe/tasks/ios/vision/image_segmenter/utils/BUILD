@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -27,6 +29,7 @@ objc_library(
         "//mediapipe/tasks/ios/core:MPPTaskOptionsProtocol",
         "//mediapipe/tasks/ios/core/utils:MPPBaseOptionsHelpers",
         "//mediapipe/tasks/ios/vision/image_segmenter:MPPImageSegmenterOptions",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -38,5 +41,6 @@ objc_library(
         "//mediapipe/framework:packet",
         "//mediapipe/framework/formats:image",
         "//mediapipe/tasks/ios/vision/image_segmenter:MPPImageSegmenterResult",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

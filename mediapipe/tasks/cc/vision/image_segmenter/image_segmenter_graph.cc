@@ -105,6 +105,35 @@ struct ImageAndTensorsOnDevice {
   Source<std::vector<Tensor>> tensors;
 };
 
+// Get the output tensor from the tflite model of given model resources.
+absl::StatusOr<const tflite::Tensor*> GetOutputTensor(
+    const core::ModelResources& model_resources) {
+  const tflite::Model& model = *model_resources.GetTfLiteModel();
+  const auto* primary_subgraph = (*model.subgraphs())[0];
+  const auto* output_tensor =
+      (*primary_subgraph->tensors())[*(*primary_subgraph->outputs()).rbegin()];
+  return output_tensor;
+}
+
+// Get the input tensor from the tflite model of given model resources.
+absl::StatusOr<const tflite::Tensor*> GetInputTensor(
+    const core::ModelResources& model_resources) {
+  const tflite::Model& model = *model_resources.GetTfLiteModel();
+  const auto* primary_subgraph = (*model.subgraphs())[0];
+  const auto* input_tensor =
+      (*primary_subgraph->tensors())[(*primary_subgraph->inputs())[0]];
+  return input_tensor;
+}
+
+absl::StatusOr<bool> ContainsQuantizedOutputTensor(
+    const core::ModelResources& model_resources) {
+  MP_ASSIGN_OR_RETURN(const tflite::Tensor* output_tensor,
+                      GetOutputTensor(model_resources));
+  return output_tensor->type() == tflite::TensorType_UINT8 ||
+         output_tensor->type() == tflite::TensorType_INT8 ||
+         output_tensor->type() == tflite::TensorType_BOOL;
+}
+
 }  // namespace
 
 absl::Status SanityCheckOptions(const ImageSegmenterGraphOptions& options) {
@@ -125,12 +154,16 @@ absl::StatusOr<LabelItems> GetLabelItemsIfAny(
   const std::string labels_filename =
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_AXIS_LABELS);
-  if (labels_filename.empty()) {
+
+  absl::StatusOr<absl::string_view> labels_file;
+  if (!labels_filename.empty()) {
+    labels_file = metadata_extractor.GetAssociatedFile(labels_filename);
+  }
+  if (labels_filename.empty() || !labels_file.ok()) {
     LabelItems empty_label_items;
     return empty_label_items;
   }
-  MP_ASSIGN_OR_RETURN(absl::string_view labels_file,
-                      metadata_extractor.GetAssociatedFile(labels_filename));
+
   const std::string display_names_filename =
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_AXIS_LABELS,
@@ -141,7 +174,7 @@ absl::StatusOr<LabelItems> GetLabelItemsIfAny(
         display_names_file,
         metadata_extractor.GetAssociatedFile(display_names_filename));
   }
-  return mediapipe::BuildLabelMapFromFiles(labels_file, display_names_file);
+  return mediapipe::BuildLabelMapFromFiles(*labels_file, display_names_file);
 }
 
 absl::Status ConfigureTensorsToSegmentationCalculator(
@@ -197,39 +230,15 @@ absl::Status ConfigureTensorsToSegmentationCalculator(
         "Segmentation tflite models are assumed to have a single subgraph.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
-  MP_ASSIGN_OR_RETURN(
-      *options->mutable_label_items(),
-      GetLabelItemsIfAny(
-          *metadata_extractor,
-          **metadata_extractor->GetOutputTensorMetadata()->crbegin(),
-          segmenter_option.display_names_locale()));
+  if (metadata_extractor->GetOutputTensorMetadata()) {
+    MP_ASSIGN_OR_RETURN(
+        *options->mutable_label_items(),
+        GetLabelItemsIfAny(
+            *metadata_extractor,
+            **metadata_extractor->GetOutputTensorMetadata()->crbegin(),
+            segmenter_option.display_names_locale()));
+  }
   return absl::OkStatus();
-}
-
-// Get the output tensor from the tflite model of given model resources.
-absl::StatusOr<const tflite::Tensor*> GetOutputTensor(
-    const core::ModelResources& model_resources) {
-  const tflite::Model& model = *model_resources.GetTfLiteModel();
-  const auto* primary_subgraph = (*model.subgraphs())[0];
-  const auto* output_tensor =
-      (*primary_subgraph->tensors())[*(*primary_subgraph->outputs()).rbegin()];
-  return output_tensor;
-}
-
-uint32_t GetOutputTensorsSize(const core::ModelResources& model_resources) {
-  const tflite::Model& model = *model_resources.GetTfLiteModel();
-  const auto* primary_subgraph = (*model.subgraphs())[0];
-  return primary_subgraph->outputs()->size();
-}
-
-// Get the input tensor from the tflite model of given model resources.
-absl::StatusOr<const tflite::Tensor*> GetInputTensor(
-    const core::ModelResources& model_resources) {
-  const tflite::Model& model = *model_resources.GetTfLiteModel();
-  const auto* primary_subgraph = (*model.subgraphs())[0];
-  const auto* input_tensor =
-      (*primary_subgraph->tensors())[(*primary_subgraph->inputs())[0]];
-  return input_tensor;
 }
 
 // Configure the ImageTransformationCalculator according to the input tensor.
@@ -525,7 +534,19 @@ class ImageSegmenterGraph : public core::ModelTaskGraph {
     auto& inference = AddInference(
         model_resources, task_options.base_options().acceleration(), graph);
     image_and_tensors.tensors >> inference.In(kTensorsTag);
-    inference.Out(kTensorsTag) >> tensor_to_images.In(kTensorsTag);
+    MP_ASSIGN_OR_RETURN(bool contains_quantized_output_tensor,
+                        ContainsQuantizedOutputTensor(model_resources));
+    auto output_tensors = inference.Out(kTensorsTag);
+    if (contains_quantized_output_tensor) {
+      auto& tensors_dequantization_node =
+          graph.AddNode("TensorsDequantizationCalculator");
+      output_tensors >> tensors_dequantization_node.In(kTensorsTag);
+      auto dequantized_tensor = tensors_dequantization_node.Out(kTensorsTag)
+                                    .Cast<std::vector<Tensor>>();
+      dequantized_tensor >> tensor_to_images.In(kTensorsTag);
+    } else {
+      output_tensors >> tensor_to_images.In(kTensorsTag);
+    }
 
     if (output_size.has_value()) {
       *output_size >> tensor_to_images.In(kOutputSizeTag);

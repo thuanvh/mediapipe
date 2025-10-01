@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -22,13 +25,15 @@ objc_library(
     hdrs = ["sources/MPPImage+TestUtils.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     module_name = "MPPImageTestUtils",
     deps = [
         "//mediapipe/tasks/ios/test/utils:MPPFileInfo",
         "//mediapipe/tasks/ios/vision/core:MPPImage",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -40,6 +45,7 @@ objc_library(
     deps = [
         "//mediapipe/tasks/ios/test/utils:MPPFileInfo",
         "//mediapipe/tasks/ios/vision/core:MPPMask",
+        "//third_party/apple_frameworks:Foundation",
         "//third_party/apple_frameworks:UIKit",
     ],
 )
@@ -49,6 +55,7 @@ cc_library(
     srcs = ["sources/parse_proto_utils.cc"],
     hdrs = ["sources/parse_proto_utils.h"],
     deps = [
+        "//third_party/apple_frameworks:Foundation",
         "@com_google_absl//absl/status",
         "@com_google_protobuf//:protobuf",
     ],

@@ -16,13 +16,17 @@ load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 
 licenses(["notice"])
 
-package(default_visibility = ["//mediapipe/tasks:internal"])
+package(default_visibility = [
+    "//mediapipe/tasks:internal",
+])
 
 swift_library(
     name = "LlmInference",
     srcs = [
         "sources/LlmInference.swift",
+        "sources/LlmInference+Session.swift",
         "//mediapipe/tasks/ios/genai/core:sources/GenAiInferenceError.swift",
+        "//mediapipe/tasks/ios/genai/core:sources/LlmSessionRunner.swift",
         "//mediapipe/tasks/ios/genai/core:sources/LlmTaskRunner.swift",
     ],
     # This ensures the compiler does not complain about MediaPipeTasksGenAIC being built separately.
@@ -30,5 +34,9 @@ swift_library(
     generated_header_name = "LlmInference-Swift.h",
     generates_header = 1,
     module_name = "MediaPipeTasksGenAI",
-    deps = ["//mediapipe/tasks/cc/genai/inference/c:libllm_inference_engine_cpu"],
+    deps = [
+        "//mediapipe/tasks/cc/genai/inference/c:libllm_inference_engine_cpu",
+        "//third_party/apple_frameworks:CoreGraphics",
+        "//third_party/apple_frameworks:Foundation",
+    ],
 )

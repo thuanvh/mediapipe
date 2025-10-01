@@ -6,12 +6,11 @@ load(
     "@org_tensorflow//tensorflow/lite:special_rules.bzl",
     "tflite_ios_lab_runner",
 )
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
 load(
     "//mediapipe/framework/tool:ios.bzl",
     "MPP_TASK_MINIMUM_OS_VERSION",
 )
-
-package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
 
@@ -29,11 +28,12 @@ TFL_DISABLED_SANITIZER_TAGS = [
 
 objc_library(
     name = "MPPLanguageDetectorObjcTestLibrary",
-    testonly = 1,
+    testonly = True,
     srcs = ["MPPLanguageDetectorTests.mm"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     data = [
@@ -43,6 +43,7 @@ objc_library(
         "//mediapipe/tasks/ios/common:MPPCommon",
         "//mediapipe/tasks/ios/test/utils:MPPFileInfo",
         "//mediapipe/tasks/ios/text/language_detector:MPPLanguageDetector",
+        "//third_party/apple_frameworks:XCTest",
     ],
 )
 

@@ -15,6 +15,8 @@
 #ifndef MEDIAPIPE_GPU_GPU_BUFFER_FORMAT_H_
 #define MEDIAPIPE_GPU_GPU_BUFFER_FORMAT_H_
 
+#include <cstdint>
+
 #ifdef __APPLE__
 #include <CoreVideo/CoreVideo.h>
 #if !TARGET_OS_OSX
@@ -90,6 +92,8 @@ struct GlTextureInfo {
 const GlTextureInfo& GlTextureInfoForGpuBufferFormat(GpuBufferFormat format,
                                                      int plane,
                                                      GlVersion gl_version);
+
+GpuBufferFormat GpuBufferFormatForGlFormat(GLenum format);
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
 ImageFormat::Format ImageFormatForGpuBufferFormat(GpuBufferFormat format);

@@ -18,6 +18,7 @@
 #include <sys/types.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <limits>
 #include <memory>
@@ -28,12 +29,12 @@
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
-#include "absl/log/absl_check.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/string_view.h"
 #include "mediapipe/tasks/cc/genai/inference/utils/xnn_utils/xnn_tensor.h"
-#include "xnnpack.h"  // from @XNNPACK
+#include "pthreadpool.h"  // from @pthreadpool
+#include "xnnpack.h"      // from @XNNPACK
 
 namespace mediapipe::tasks::genai {
 namespace xnn_utils {
@@ -91,9 +92,6 @@ struct RuntimeConfigs {
   } activation_precision = ActivationPrecision::kFP32;
 };
 
-absl::StatusOr<std::shared_ptr<XnnWeightsCache>> CreateWeightsCache(
-    size_t buffer_size = /*XNN_DEFAULT_WEIGHTS_BUFFER_SIZE=*/1048576);
-
 class XnnGraph;
 
 // XnnGraphBuilder is used to construct XnnGraph (through Build()). Once a
@@ -113,8 +111,8 @@ class XnnGraphBuilder {
   absl::StatusOr<std::unique_ptr<XnnGraph>> Build();
 
   // New input or output tensor.
-  absl::StatusOr<std::shared_ptr<Tensor>> NewInput(
-      Tensor::DimsType dims, absl::string_view source = "");
+  absl::StatusOr<std::shared_ptr<Tensor>> NewInput(Tensor::DimsType dims,
+                                                   absl::string_view tag = "");
   absl::Status MarkInput(std::shared_ptr<Tensor> t);
 
   // New static weight, populate value before Build()
@@ -135,6 +133,16 @@ class XnnGraphBuilder {
 
   absl::StatusOr<std::shared_ptr<Tensor>> Relu(std::shared_ptr<Tensor> input);
 
+  absl::StatusOr<std::shared_ptr<Tensor>> Relu1p5(
+      std::shared_ptr<Tensor> input);
+
+  absl::StatusOr<std::shared_ptr<Tensor>> Abs(std::shared_ptr<Tensor> input);
+
+  absl::StatusOr<std::shared_ptr<Tensor>> Log(std::shared_ptr<Tensor> input);
+
+  absl::StatusOr<std::shared_ptr<Tensor>> CopySign(std::shared_ptr<Tensor> lhs,
+                                                   std::shared_ptr<Tensor> rhs);
+
   absl::StatusOr<std::shared_ptr<Tensor>> Clamp(std::shared_ptr<Tensor> input,
                                                 ClampParams params);
 
@@ -144,14 +152,20 @@ class XnnGraphBuilder {
   absl::StatusOr<std::shared_ptr<Tensor>> CapTanh(std::shared_ptr<Tensor> input,
                                                   float cap);
 
-  // Average over last dimension, keep num of dims same.
+  // Reduction over last dimension, keep num of dims same.
+  absl::StatusOr<std::shared_ptr<Tensor>> ReduceLastDim(
+      std::shared_ptr<Tensor> input, xnn_reduce_operator reduce_operator);
+
   absl::StatusOr<std::shared_ptr<Tensor>> AvgLastDim(
       std::shared_ptr<Tensor> input);
 
   absl::StatusOr<std::shared_ptr<Tensor>> Rms(std::shared_ptr<Tensor> input);
 
+  // Root Mean Square normalization
+  // out = input / rms(input) * (1 + scale)
+  // if scale is absent, scale is considered to be zero.
   absl::StatusOr<std::shared_ptr<Tensor>> RmsNorm(
-      std::shared_ptr<Tensor> input, std::shared_ptr<Tensor> scale);
+      std::shared_ptr<Tensor> input, std::shared_ptr<Tensor> scale = nullptr);
 
   absl::StatusOr<std::shared_ptr<Tensor>> Reshape(std::shared_ptr<Tensor> input,
                                                   Tensor::DimsType new_dims);
@@ -160,7 +174,7 @@ class XnnGraphBuilder {
                                                   Tensor::DimsType permute);
 
   // Create a slice of the input tensor. Both `starts` and `ends` must have
-  // the same sizes as the number of dimmensions in the input tensor. The
+  // the same sizes as the number of dimensions in the input tensor. The
   // resulting slice includes data from `[start[i], end[i])` for each dimension.
   // For instance, for input A = [1, 2, 3, 4] and starts = [1] and ends = [3],
   // the resulting slice would be [2, 3].
@@ -172,7 +186,7 @@ class XnnGraphBuilder {
   // dimensions unchanged. For instance, for input A = [B, M, N] and axis = 1,
   // the output slice would be [B, offset:offset+length, N].
   absl::StatusOr<std::shared_ptr<Tensor>> Slice(std::shared_ptr<Tensor> input,
-                                                size_t axis, size_t offset,
+                                                size_t axis, int64_t offset,
                                                 size_t length);
 
   // Concatenate two input tensors along the provided axis. Both input tensors
@@ -197,7 +211,7 @@ class XnnGraphBuilder {
   }
 
   absl::StatusOr<std::shared_ptr<Tensor>> BatchMatMul(
-      std::shared_ptr<Tensor> input, std::shared_ptr<Tensor> weight,
+      std::shared_ptr<Tensor> lhs, std::shared_ptr<Tensor> rhs,
       FullConnParams params = FullConnParams());
 
   absl::StatusOr<std::shared_ptr<Tensor>> FullConn(
@@ -248,6 +262,10 @@ class XnnGraphBuilder {
       std::shared_ptr<Tensor> lhs, float rhs,
       ClampParams params = ClampParams());
 
+  absl::StatusOr<std::shared_ptr<Tensor>> ElementSub(
+      float lhs, std::shared_ptr<Tensor> rhs,
+      ClampParams params = ClampParams());
+
   absl::StatusOr<std::shared_ptr<Tensor>> ElementMul(
       std::shared_ptr<Tensor> lhs, std::shared_ptr<Tensor> rhs,
       ClampParams params = ClampParams());
@@ -289,11 +307,14 @@ class XnnGraphBuilder {
       std::shared_ptr<Tensor> beta = nullptr);
 
  protected:
+  absl::StatusOr<std::shared_ptr<Tensor>> ExpandDims(
+      std::shared_ptr<Tensor> input, Tensor::DimsType new_axes);
+
   absl::StatusOr<std::shared_ptr<Tensor>> IntermediateTensor(
-      Tensor::DimsType dims, absl::string_view source = "");
+      Tensor::DimsType dims, absl::string_view tag = "");
   absl::StatusOr<std::shared_ptr<Tensor>> IntermediateTensor(
       Tensor::DimsType dims, xnn_datatype data_type,
-      absl::string_view source = "");
+      absl::string_view tag = "");
 
   std::unique_ptr<RuntimeConfigs> runtime_configs_;
   const xnn_datatype data_type_;
@@ -308,6 +329,9 @@ class XnnGraphBuilder {
   std::vector<std::shared_ptr<Tensor>> interm_tensors_added_order_;
   // Intermediate tensors in hash_set, for easy existence check.
   absl::flat_hash_set<std::shared_ptr<Tensor>> interm_tensors_;
+
+  // Static weights keeping the same order as how they were added.
+  std::vector<std::shared_ptr<Tensor>> static_weights_added_order_;
   absl::flat_hash_set<std::shared_ptr<Tensor>> static_weights_;
 
   // Caches
@@ -350,8 +374,6 @@ class XnnGraph {
 
   std::vector<std::shared_ptr<Tensor>> input_tensors_;
   std::vector<std::shared_ptr<Tensor>> output_tensors_;
-
-  absl::flat_hash_set<std::shared_ptr<Tensor>> static_weights_;
 };
 
 }  // namespace xnn_utils

@@ -20,12 +20,11 @@ load(
     "@org_tensorflow//tensorflow/lite:special_rules.bzl",
     "tflite_ios_lab_runner",
 )
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
 load(
     "//mediapipe/framework/tool:ios.bzl",
     "MPP_TASK_MINIMUM_OS_VERSION",
 )
-
-package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
 
@@ -43,12 +42,13 @@ TFL_DISABLED_SANITIZER_TAGS = [
 
 objc_library(
     name = "MPPFloatRingBufferObjcTestLibrary",
-    testonly = 1,
+    testonly = True,
     srcs = ["MPPFloatRingBufferTests.m"],
     tags = TFL_DEFAULT_TAGS,
     deps = [
         "//mediapipe/tasks/ios/audio/core:MPPFloatRingBuffer",
         "//mediapipe/tasks/ios/common:MPPCommon",
+        "//third_party/apple_frameworks:XCTest",
     ],
 )
 
@@ -64,11 +64,12 @@ ios_unit_test(
 
 objc_library(
     name = "MPPAudioRecordObjcTestLibrary",
-    testonly = 1,
+    testonly = True,
     srcs = ["MPPAudioRecordTests.mm"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     data = [
@@ -80,6 +81,8 @@ objc_library(
         "//mediapipe/tasks/ios/common:MPPCommon",
         "//mediapipe/tasks/ios/test/audio/core/utils:AVAudioPCMBufferTestUtils",
         "//mediapipe/tasks/ios/test/utils:MPPFileInfo",
+        "//third_party/apple_frameworks:AVFoundation",
+        "//third_party/apple_frameworks:XCTest",
     ],
 )
 
@@ -90,5 +93,39 @@ ios_unit_test(
     tags = TFL_DEFAULT_TAGS + TFL_DISABLED_SANITIZER_TAGS,
     deps = [
         ":MPPAudioRecordObjcTestLibrary",
+    ],
+)
+
+objc_library(
+    name = "MPPAudioDataObjcTestLibrary",
+    testonly = True,
+    srcs = ["MPPAudioDataTests.mm"],
+    copts = [
+        "-ObjC++",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
+        "-x objective-c++",
+    ],
+    data = [
+        "//mediapipe/tasks/testdata/audio:test_audio_clips",
+    ],
+    tags = TFL_DEFAULT_TAGS,
+    deps = [
+        "//mediapipe/tasks/ios/audio/core:MPPAudioData",
+        "//mediapipe/tasks/ios/common:MPPCommon",
+        "//mediapipe/tasks/ios/test/audio/core/utils:AVAudioPCMBufferTestUtils",
+        "//mediapipe/tasks/ios/test/utils:MPPFileInfo",
+        "//third_party/apple_frameworks:AVFoundation",
+        "//third_party/apple_frameworks:XCTest",
+    ],
+)
+
+ios_unit_test(
+    name = "MPPAudioDataObjcTest",
+    minimum_os_version = MPP_TASK_MINIMUM_OS_VERSION,
+    runner = tflite_ios_lab_runner("IOS_LATEST"),
+    tags = TFL_DEFAULT_TAGS + TFL_DISABLED_SANITIZER_TAGS,
+    deps = [
+        ":MPPAudioDataObjcTestLibrary",
     ],
 )

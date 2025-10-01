@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = [
     "//mediapipe/tasks:internal",
 ])
@@ -22,7 +24,10 @@ objc_library(
     name = "MPPTextEmbedderOptions",
     srcs = ["sources/MPPTextEmbedderOptions.m"],
     hdrs = ["sources/MPPTextEmbedderOptions.h"],
-    deps = ["//mediapipe/tasks/ios/core:MPPTaskOptions"],
+    deps = [
+        "//mediapipe/tasks/ios/core:MPPTaskOptions",
+        "//third_party/apple_frameworks:Foundation",
+    ],
 )
 
 objc_library(
@@ -32,6 +37,7 @@ objc_library(
     deps = [
         "//mediapipe/tasks/ios/components/containers:MPPEmbeddingResult",
         "//mediapipe/tasks/ios/core:MPPTaskResult",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -41,7 +47,8 @@ objc_library(
     hdrs = ["sources/MPPTextEmbedder.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     module_name = "MPPTextEmbedder",
@@ -58,5 +65,6 @@ objc_library(
         "//mediapipe/tasks/ios/text/core:MPPTextTaskRunner",
         "//mediapipe/tasks/ios/text/text_embedder/utils:MPPTextEmbedderOptionsHelpers",
         "//mediapipe/tasks/ios/text/text_embedder/utils:MPPTextEmbedderResultHelpers",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

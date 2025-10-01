@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -22,7 +24,8 @@ objc_library(
     hdrs = ["sources/MPPHolisticLandmarkerResult+ProtobufHelpers.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     deps = [
@@ -31,5 +34,6 @@ objc_library(
         "//mediapipe/tasks/ios/test/vision/utils:parse_proto_utils",
         "//mediapipe/tasks/ios/vision/holistic_landmarker:MPPHolisticLandmarkerResult",
         "//mediapipe/tasks/ios/vision/holistic_landmarker/utils:MPPHolisticLandmarkerResultHelpers",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

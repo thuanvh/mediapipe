@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//mediapipe/framework/port:build_config.bzl", "mediapipe_proto_library")
 
 # Copyright 2019 The MediaPipe Authors.
@@ -19,7 +21,6 @@ licenses(["notice"])
 package(default_visibility = [
     "//buzz/diffractor/mediapipe:__subpackages__",
     "//mediapipe/examples:__subpackages__",
-    "//mediapipe/viz:__subpackages__",
     "//mediapipe/web/solutions:__subpackages__",
 ])
 
@@ -233,6 +234,7 @@ cc_test(
     size = "large",
     timeout = "long",
     srcs = ["scene_cropping_calculator_test.cc"],
+    tags = ["noasan"],  #  TODO b/352507058 - ASAN run takes 25 minutes. Disabled for now.
     deps = [
         ":scene_cropping_calculator",
         "//mediapipe/examples/desktop/autoflip:autoflip_messages_cc_proto",

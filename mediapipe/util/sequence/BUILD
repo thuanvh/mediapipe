@@ -13,6 +13,8 @@
 # limitations under the License.
 #
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 # Placeholder: load py_library
 # Placeholder: load py_test
 
@@ -24,7 +26,7 @@ cc_library(
     name = "media_sequence_util",
     hdrs = ["media_sequence_util.h"],
     visibility = [
-        "//home/interaction:__subpackages__",
+        "//learning/eval/canon/util/conversion/tensorflow/mediasequence:__pkg__",
         "//mediapipe:__subpackages__",
     ],
     deps = [

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -20,7 +22,10 @@ objc_library(
     name = "MPPLanguageDetectorOptions",
     srcs = ["sources/MPPLanguageDetectorOptions.m"],
     hdrs = ["sources/MPPLanguageDetectorOptions.h"],
-    deps = ["//mediapipe/tasks/ios/core:MPPTaskOptions"],
+    deps = [
+        "//mediapipe/tasks/ios/core:MPPTaskOptions",
+        "//third_party/apple_frameworks:Foundation",
+    ],
 )
 
 objc_library(
@@ -38,7 +43,8 @@ objc_library(
     hdrs = ["sources/MPPLanguageDetector.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     module_name = "MPPLanguageDetector",
@@ -54,5 +60,6 @@ objc_library(
         "//mediapipe/tasks/ios/text/core:MPPTextTaskRunner",
         "//mediapipe/tasks/ios/text/language_detector/utils:MPPLanguageDetectorOptionsHelpers",
         "//mediapipe/tasks/ios/text/language_detector/utils:MPPLanguageDetectorResultHelpers",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

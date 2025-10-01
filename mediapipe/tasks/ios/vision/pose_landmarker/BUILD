@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -24,6 +26,7 @@ objc_library(
         "//mediapipe/tasks/ios/components/containers:MPPLandmark",
         "//mediapipe/tasks/ios/core:MPPTaskResult",
         "//mediapipe/tasks/ios/vision/core:MPPMask",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -35,6 +38,7 @@ objc_library(
         ":MPPPoseLandmarkerResult",
         "//mediapipe/tasks/ios/core:MPPTaskOptions",
         "//mediapipe/tasks/ios/vision/core:MPPRunningMode",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -42,7 +46,10 @@ objc_library(
     name = "MPPPoseLandmarksConnections",
     hdrs = ["sources/MPPPoseLandmarksConnections.h"],
     module_name = "MPPPoseLandmarksConnections",
-    deps = ["//mediapipe/tasks/ios/components/containers:MPPConnection"],
+    deps = [
+        "//mediapipe/tasks/ios/components/containers:MPPConnection",
+        "//third_party/apple_frameworks:Foundation",
+    ],
 )
 
 objc_library(
@@ -51,7 +58,8 @@ objc_library(
     hdrs = ["sources/MPPPoseLandmarker.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     module_name = "MPPPoseLandmarker",
@@ -69,5 +77,6 @@ objc_library(
         "//mediapipe/tasks/ios/vision/core:MPPVisionTaskRunner",
         "//mediapipe/tasks/ios/vision/pose_landmarker/utils:MPPPoseLandmarkerOptionsHelpers",
         "//mediapipe/tasks/ios/vision/pose_landmarker/utils:MPPPoseLandmarkerResultHelpers",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

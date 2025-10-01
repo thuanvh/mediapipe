@@ -11,6 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
 
 licenses(["notice"])
 
@@ -207,11 +212,12 @@ cc_library(
 
 cc_library(
     name = "test_context_builder",
-    testonly = 1,
+    testonly = True,
     hdrs = ["test_context_builder.h"],
     deps = [
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:calculator_options_cc_proto",
+        "//mediapipe/framework:calculator_state",
         "//mediapipe/framework:mediapipe_options_cc_proto",
         "//mediapipe/framework/port:status",
         "//mediapipe/framework/port:statusor",

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -23,6 +25,7 @@ objc_library(
     deps = [
         "//mediapipe/tasks/ios/core:MPPTaskResult",
         "//mediapipe/tasks/ios/vision/core:MPPMask",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -34,6 +37,7 @@ objc_library(
         ":MPPImageSegmenterResult",
         "//mediapipe/tasks/ios/core:MPPTaskOptions",
         "//mediapipe/tasks/ios/vision/core:MPPRunningMode",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -43,7 +47,8 @@ objc_library(
     hdrs = ["sources/MPPImageSegmenter.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     module_name = "MPPImageSegmenter",
@@ -62,5 +67,6 @@ objc_library(
         "//mediapipe/tasks/ios/vision/image_segmenter/utils:MPPImageSegmenterOptionsHelpers",
         "//mediapipe/tasks/ios/vision/image_segmenter/utils:MPPImageSegmenterResultHelpers",
         "//mediapipe/util:label_map_cc_proto",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -22,4 +24,5 @@ objc_library(
         "sources/MPPCommon.h",
     ],
     module_name = "MPPCommon",
+    deps = ["//third_party/apple_frameworks:Foundation"],
 )

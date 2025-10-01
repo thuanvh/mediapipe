@@ -4,6 +4,7 @@
 # the detection results for one or more face categories, using Face Landmarker.
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//mediapipe/framework/port:build_config.bzl", "mediapipe_ts_declaration", "mediapipe_ts_library")
 
 package(default_visibility = ["//mediapipe/tasks:internal"])
@@ -85,6 +86,6 @@ mediapipe_ts_library(
 
 jasmine_node_test(
     name = "face_landmarker_test",
+    srcs = [":face_landmarker_test_lib"],
     tags = ["nomsan"],
-    deps = [":face_landmarker_test_lib"],
 )

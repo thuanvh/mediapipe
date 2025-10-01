@@ -15,7 +15,6 @@
 # Placeholder for internal Python strict library and test compatibility macro.
 
 package(default_visibility = [
-    "//cloud/ml/applications/vision/model_garden/model_oss/mediapipe:__subpackages__",
     "//mediapipe:__subpackages__",
 ])
 
@@ -24,4 +23,8 @@ licenses(["notice"])
 py_library(
     name = "hyperparameters",
     srcs = ["hyperparameters.py"],
+    deps = [
+        "@model_maker_pip_deps_tensorflow//:pkg",
+        "@model_maker_pip_deps_tf_models_official//:pkg",
+    ],
 )

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
+
 package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
@@ -23,6 +25,7 @@ objc_library(
     deps = [
         "//mediapipe/tasks/ios/components/containers:MPPDetection",
         "//mediapipe/tasks/ios/core:MPPTaskResult",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -34,6 +37,7 @@ objc_library(
         ":MPPObjectDetectorResult",
         "//mediapipe/tasks/ios/core:MPPTaskOptions",
         "//mediapipe/tasks/ios/vision/core:MPPRunningMode",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )
 
@@ -43,7 +47,8 @@ objc_library(
     hdrs = ["sources/MPPObjectDetector.h"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     deps = [
@@ -58,5 +63,6 @@ objc_library(
         "//mediapipe/tasks/ios/vision/core:MPPVisionTaskRunner",
         "//mediapipe/tasks/ios/vision/object_detector/utils:MPPObjectDetectorOptionsHelpers",
         "//mediapipe/tasks/ios/vision/object_detector/utils:MPPObjectDetectorResultHelpers",
+        "//third_party/apple_frameworks:Foundation",
     ],
 )

@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 licenses(["notice"])
 
-package(default_visibility = ["//mediapipe/tasks:internal"])
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "conditioned_image_graph",
@@ -123,6 +127,7 @@ cc_library(
         "//mediapipe/tasks/cc/vision/face_landmarker",
         "//mediapipe/tasks/cc/vision/face_landmarker/proto:face_landmarker_graph_options_cc_proto",
         "//mediapipe/tasks/cc/vision/face_landmarker/proto:face_landmarks_detector_graph_options_cc_proto",
+        "//mediapipe/tasks/cc/vision/image_generator/diffuser:stable_diffusion_iterate_calculator_cc_proto",
         "//mediapipe/tasks/cc/vision/image_generator/proto:conditioned_image_graph_options_cc_proto",
         "//mediapipe/tasks/cc/vision/image_generator/proto:control_plugin_graph_options_cc_proto",
         "//mediapipe/tasks/cc/vision/image_generator/proto:image_generator_graph_options_cc_proto",
@@ -131,6 +136,7 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
         "@com_google_absl//absl/time",
     ],
 )

@@ -4,6 +4,7 @@
 # BERT-based text classification).
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//mediapipe/framework/port:build_config.bzl", "mediapipe_ts_declaration", "mediapipe_ts_library")
 
 package(default_visibility = ["//mediapipe/tasks:internal"])
@@ -65,5 +66,5 @@ mediapipe_ts_library(
 
 jasmine_node_test(
     name = "text_classifier_test",
-    deps = [":text_classifier_test_lib"],
+    srcs = [":text_classifier_test_lib"],
 )

@@ -18,10 +18,12 @@
 #ifndef MEDIAPIPE_GPU_GL_TEXTURE_BUFFER_H_
 #define MEDIAPIPE_GPU_GL_TEXTURE_BUFFER_H_
 
-#include <atomic>
+#include <cstddef>
+#include <functional>
 #include <memory>
 
-#include "absl/memory/memory.h"
+#include "absl/base/thread_annotations.h"
+#include "absl/synchronization/mutex.h"
 #include "mediapipe/framework/formats/image_frame.h"
 #include "mediapipe/gpu/gl_base.h"
 #include "mediapipe/gpu/gl_context.h"
@@ -139,7 +141,7 @@ class GlTextureBuffer
   void WaitForConsumersOnGpu();
 
   // Returns the GL context this buffer was created with.
-  const std::shared_ptr<GlContext>& GetProducerContext() {
+  const std::shared_ptr<GlContext>& GetProducerContext() const {
     return producer_context_;
   }
 
@@ -154,7 +156,10 @@ class GlTextureBuffer
   // Returns true on success.
   bool CreateInternal(const void* data, int alignment = 4);
 
-  void ViewDoneWriting(const GlTextureView& view);
+  void ViewDoneReading(const GlTextureView& view,
+                       bool sync_with_external_context) const;
+  void ViewDoneWriting(const GlTextureView& view,
+                       bool sync_with_external_context);
 
   friend class GlCalculatorHelperImpl;
 
@@ -169,10 +174,17 @@ class GlTextureBuffer
   // Tokens tracking the point when consumers finished using this texture.
   mutable std::unique_ptr<GlMultiSyncPoint> consumer_multi_sync_
       ABSL_GUARDED_BY(consumer_sync_mutex_) =
-          absl::make_unique<GlMultiSyncPoint>();
+          std::make_unique<GlMultiSyncPoint>();
   DeletionCallback deletion_callback_;
   std::shared_ptr<GlContext> producer_context_;
 };
+
+// Reads `texture_view` into `output`.
+// NOTE: It's clients responsibility to allocate `output` properly and provide
+// the right `size`.
+// NOTE: Must be invoked on a thread with GL context.
+void ReadTexture(GlContext& ctx, const GlTextureView& texture_view,
+                 GpuBufferFormat format, void* output, size_t size);
 
 using GlTextureBufferSharedPtr = std::shared_ptr<GlTextureBuffer>;
 

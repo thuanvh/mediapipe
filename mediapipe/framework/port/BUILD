@@ -15,6 +15,8 @@
 # Description:
 #  Port of various libraries and utilities.
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 licenses(["notice"])
 
 package(
@@ -113,6 +115,7 @@ cc_library(
         ":status",
         "//mediapipe/framework/deps:file_helpers",
         "//mediapipe/framework/deps:file_path",
+        "//mediapipe/framework/deps:mmapped_file",
     ],
 )
 
@@ -124,6 +127,7 @@ cc_library(
             "//mediapipe/framework/deps:image_resizer",
             "//mediapipe/framework/port:opencv_core",
         ],
+        "//mediapipe:emscripten": ["//mediapipe/framework/deps:image_resizer"],
     }),
 )
 
@@ -134,10 +138,11 @@ cc_library(
 
 cc_library(
     name = "benchmark",
-    testonly = 1,
+    testonly = True,
     hdrs = ["benchmark.h"],
     deps = [
         "@com_google_benchmark//:benchmark",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -153,7 +158,7 @@ cc_library(
 
 cc_library(
     name = "gtest",
-    testonly = 1,
+    testonly = True,
     hdrs = [
         "gmock.h",
         "gtest.h",
@@ -169,7 +174,7 @@ cc_library(
 
 cc_library(
     name = "gtest_main",
-    testonly = 1,
+    testonly = True,
     hdrs = [
         "gmock.h",
         "gtest.h",
@@ -186,7 +191,7 @@ cc_library(
 
 cc_library(
     name = "gtest_main_no_heapcheck",
-    testonly = 1,
+    testonly = True,
     hdrs = [
         "gmock.h",
         "gtest.h",
@@ -381,7 +386,9 @@ cc_library(
 cc_library(
     name = "singleton",
     hdrs = ["singleton.h"],
-    deps = ["//mediapipe/framework/deps:singleton"],
+    deps = [
+        "//mediapipe/framework/deps:singleton",
+    ],
 )
 
 cc_library(
@@ -425,7 +432,7 @@ cc_library(
 
 cc_library(
     name = "status_matchers",
-    testonly = 1,
+    testonly = True,
     hdrs = ["status_matchers.h"],
     deps = [
         ":status",
@@ -440,6 +447,7 @@ cc_library(
         "//conditions:default": [":threadpool_impl_default_to_google"],
         "//mediapipe:android": [":threadpool_impl_default_to_mediapipe"],
         "//mediapipe:apple": [":threadpool_impl_default_to_mediapipe"],
+        "//mediapipe:emscripten": [":threadpool_impl_default_to_mediapipe"],
     }),
 )
 
@@ -478,4 +486,10 @@ cc_library(
     name = "requires",
     hdrs = ["requires.h"],
     deps = ["//mediapipe/framework/deps:requires"],
+)
+
+cc_library(
+    name = "compile_time_string",
+    hdrs = ["compile_time_string.h"],
+    deps = ["//mediapipe/framework/deps:compile_time_string"],
 )

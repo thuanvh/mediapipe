@@ -3,12 +3,11 @@ load(
     "@org_tensorflow//tensorflow/lite:special_rules.bzl",
     "tflite_ios_lab_runner",
 )
+load("@rules_cc//cc:objc_library.bzl", "objc_library")
 load(
     "//mediapipe/framework/tool:ios.bzl",
     "MPP_TASK_MINIMUM_OS_VERSION",
 )
-
-package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
 
@@ -26,11 +25,12 @@ TFL_DISABLED_SANITIZER_TAGS = [
 
 objc_library(
     name = "MPPFaceLandmarkeResultHelpersTestLibrary",
-    testonly = 1,
+    testonly = True,
     srcs = ["sources/MPPFaceLandmarkerResult+HelpersTests.mm"],
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
+        "-Xclang=-fno-cxx-modules",
         "-x objective-c++",
     ],
     deps = [
@@ -41,6 +41,7 @@ objc_library(
         "//mediapipe/tasks/cc/vision/face_geometry/proto:face_geometry_cc_proto",
         "//mediapipe/tasks/ios/vision/face_landmarker:MPPFaceLandmarkerResult",
         "//mediapipe/tasks/ios/vision/face_landmarker/utils:MPPFaceLandmarkerResultHelpers",
+        "//third_party/apple_frameworks:XCTest",
     ],
 )
 

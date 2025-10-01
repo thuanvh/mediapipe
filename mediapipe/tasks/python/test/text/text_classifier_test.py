@@ -65,19 +65,23 @@ _BERT_POSITIVE_RESULTS = TextClassifierResult(
             categories=[
                 _Category(
                     index=1,
-                    score=0.9995,
+                    score=0.9994,
                     display_name='',
-                    category_name='positive'),
+                    category_name='positive',
+                ),
                 _Category(
                     index=0,
-                    score=0.0005,
+                    score=0.0006,
                     display_name='',
-                    category_name='negative')
+                    category_name='negative',
+                ),
             ],
             head_index=0,
-            head_name='probability')
+            head_name='probability',
+        )
     ],
-    timestamp_ms=0)
+    timestamp_ms=0,
+)
 _REGEX_NEGATIVE_RESULTS = TextClassifierResult(
     classifications=[
         _Classifications(
@@ -156,6 +160,30 @@ class TextClassifierTest(parameterized.TestCase):
       base_options = _BaseOptions(model_asset_buffer=f.read())
       options = _TextClassifierOptions(base_options=base_options)
       classifier = _TextClassifier.create_from_options(options)
+      self.assertIsInstance(classifier, _TextClassifier)
+
+  def test_create_from_options_succeeds_with_allow_list(self):
+    base_options = _BaseOptions(model_asset_path=self.model_path)
+    options = _TextClassifierOptions(
+        base_options=base_options, category_allowlist=['positive']
+    )
+    with _TextClassifier.create_from_options(options) as classifier:
+      self.assertIsInstance(classifier, _TextClassifier)
+
+  def test_create_from_options_succeeds_with_deny_list(self):
+    base_options = _BaseOptions(model_asset_path=self.model_path)
+    options = _TextClassifierOptions(
+        base_options=base_options, category_denylist=['negative']
+    )
+    with _TextClassifier.create_from_options(options) as classifier:
+      self.assertIsInstance(classifier, _TextClassifier)
+
+  def test_create_from_options_succeeds_with_display_names_locale(self):
+    base_options = _BaseOptions(model_asset_path=self.model_path)
+    options = _TextClassifierOptions(
+        base_options=base_options, display_names_locale='en'
+    )
+    with _TextClassifier.create_from_options(options) as classifier:
       self.assertIsInstance(classifier, _TextClassifier)
 
   @parameterized.parameters(

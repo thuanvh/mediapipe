@@ -113,6 +113,18 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_cat_large_jpg",
+        sha256 = "f5e8996df94e2257cd92838954f57ac5e07bef1238228e518c893f0878511f96",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/cat_large.jpg?generation=1755013693080046"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_cat_large_mask_png",
+        sha256 = "16b6398efc3835403e2d20c101014ba47f47595ec51f2ea0da8bf402d1019c37",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/cat_large_mask.png?generation=1755013694926267"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_cat_mask_jpg",
         sha256 = "bae065a685f2d32f1856151b5181671aa4d09925b55766935a30bbc8dafadcd0",
         urls = ["https://storage.googleapis.com/mediapipe-assets/cat_mask.jpg?generation=1661875677203533"],
@@ -257,15 +269,9 @@ def external_files():
     )
 
     http_file(
-        name = "com_google_mediapipe_dummy_face_stylizer_tflite",
-        sha256 = "c44a32a673790aac4aca63ca4b4192b9870c21045241e69d9fe09b7ad1a38d65",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/dummy_face_stylizer.tflite?generation=1682960595073526"],
-    )
-
-    http_file(
         name = "com_google_mediapipe_dummy_gesture_recognizer_task",
-        sha256 = "18e54586bda33300d459ca140cd045f6daf43d897224ba215a16db3423eae18e",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/dummy_gesture_recognizer.task?generation=1665707319890725"],
+        sha256 = "76de8c58d206d098557959d574953c2db3a4363fa52922ca198450d5d696814d",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/dummy_gesture_recognizer.task?generation=1728509644439822"],
     )
 
     http_file(
@@ -289,7 +295,7 @@ def external_files():
     http_file(
         name = "com_google_mediapipe_efficientdet_lite0_fp16_no_nms_tflite",
         sha256 = "237a58389081333e5cf4154e42b593ce7dd357445536fcaf4ca5bc51c2c50f1c",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/efficientdet_lite0_fp16_no_nms.tflite?generation=1693610182046114"],
+        urls = ["https://storage.googleapis.com/mediapipe-assets/efficientdet_lite0_fp16_no_nms.tflite?generation=1730305296514873"],
     )
 
     http_file(
@@ -365,9 +371,21 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_face_detection_full_range_sparse_with_metadata_tflite",
+        sha256 = "0a058d9248f61fa8c902e12307c999c3b0312ce87e070600444c6f2f6ae727b9",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/face_detection_full_range_sparse_with_metadata.tflite?generation=1757366808097656"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_face_detection_full_range_tflite",
         sha256 = "3698b18f063835bc609069ef052228fbe86d9c9a6dc8dcb7c7c2d69aed2b181b",
         urls = ["https://storage.googleapis.com/mediapipe-assets/face_detection_full_range.tflite?generation=1674261620964007"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_face_detection_full_range_with_metadata_tflite",
+        sha256 = "f5fd43a368d0eab9873f021eb741223a3e015759a46240a8dddf27af2def3f3e",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/face_detection_full_range_with_metadata.tflite?generation=1757366810097339"],
     )
 
     http_file(
@@ -377,9 +395,15 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_face_detection_short_range_with_metadata_tflite",
+        sha256 = "42012b078cc201e994674ac863862577279644f3ba405729ccd964f03e9f12d5",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/face_detection_short_range_with_metadata.tflite?generation=1757366812143777"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_face_geometry_expected_out_pbtxt",
-        sha256 = "4a4ed08055a5bc9281472dd60180d11f0cdc9a15fa1788d87a58af3d06b2c6e4",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/face_geometry_expected_out.pbtxt?generation=1678323580380646"],
+        sha256 = "c23c55c14b24523e7fe51ee9ff90b9d4d32d82852ab3e452af9064e60c91c4d1",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/face_geometry_expected_out.pbtxt?generation=1737065432962469"],
     )
 
     http_file(
@@ -425,27 +449,15 @@ def external_files():
     )
 
     http_file(
-        name = "com_google_mediapipe_face_stylization_dummy_tflite",
-        sha256 = "f57fd2d5638def25466f6fec142eb3397d8ad99a9bd0a9344b622bad7c3f0376",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/face_stylization_dummy.tflite?generation=1678323589048063"],
-    )
-
-    http_file(
-        name = "com_google_mediapipe_face_stylizer_color_ink_task",
-        sha256 = "887a490b74046ecb2b1d092cc0173a961b4ed3640aaadeafa852b1122ca23b2a",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/face_stylizer_color_ink.task?generation=1697732437695259"],
-    )
-
-    http_file(
         name = "com_google_mediapipe_face_stylizer_json",
         sha256 = "ad89860d5daba6a1c4163a576428713fc3ddab76d6bbaf06d675164423ae159f",
         urls = ["https://storage.googleapis.com/mediapipe-assets/face_stylizer.json?generation=1682960598942694"],
     )
 
     http_file(
-        name = "com_google_mediapipe_face_stylizer_task",
-        sha256 = "423f350aab236123818adb7b39e0a14e14708a9a019fb2fe00a015a2561fd0c8",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/face_stylizer.task?generation=1693433010526766"],
+        name = "com_google_mediapipe_falcon_rw_1b_test_weight_pt",
+        sha256 = "62972530d362e881747f0f309573f32421a13b787603ab89874a23f4a5d44f44",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/falcon_rw_1b_test_weight.pt?generation=1728509646701969"],
     )
 
     http_file(
@@ -707,15 +719,51 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_libc___shared_so",
+        sha256 = "816d497229b6678db485b5dc16ae7d2ac63dc015691b1828bc35c4aa2ed6eed4",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/libc++_shared.so?generation=1730305298946708"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_libimagegenerator_gpu_so",
-        sha256 = "9bfb1954ad1397f7b3fff621738ccd43ad0bc0c6bce42438a806ae2368f4c5b5",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/libimagegenerator_gpu.so?generation=1694488131511338"],
+        sha256 = "6ee232fed2a44b9448a73db2601f845552978cc1dfcaba7623e8abe5474229a5",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/libimagegenerator_gpu.so?generation=1755013698249183"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_libopencv_core_3_4_darwin_a",
+        sha256 = "1e4355f5a3813f7656cf7c2d64b6c5d42d4c20688c2c4a08b51572b714e3795a",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/libopencv_core.3.4.darwin.a?generation=1728509651551637"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_libopencv_core_3_4_darwin_arm64_a",
+        sha256 = "4a836f880d86123cb8bc1d838e53bf44053c683951c4e87921dddca7434d8be3",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/libopencv_core.3.4.darwin_arm64.a?generation=1728509653713172"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_libopencv_imgproc_3_4_darwin_a",
+        sha256 = "6501109ed42eec78f54330ec14b99cae86c5f0db52651636ccf2a44297808eb7",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/libopencv_imgproc.3.4.darwin.a?generation=1728509656218122"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_libopencv_imgproc_3_4_darwin_arm64_a",
+        sha256 = "4e8019ca2732c07c173188dbf156b8321e350873ce2115327642788001ead246",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/libopencv_imgproc.3.4.darwin_arm64.a?generation=1728509658402901"],
     )
 
     http_file(
         name = "com_google_mediapipe_living_room_jpg",
         sha256 = "8d74535dfe58e7d62dee99df5ab7741ad373a456797cf4d99048dfd17ccb0d6c",
         urls = ["https://storage.googleapis.com/mediapipe-assets/living_room.jpg?generation=1699635092884512"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_magic_touch_tflite",
+        sha256 = "e24338a717c1b7ad8d159666677ef400babb7f33b8ad60c4d96db4ecf694cd25",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/magic_touch.tflite?generation=1755013700527059"],
     )
 
     http_file(
@@ -881,6 +929,12 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_mobile_raid_det_nms_max_detections_40_max_labels_per_box_5_norm_coord_tflite",
+        sha256 = "7df0e6fa124c6f30e5c5661f244e6c98bb8470ce2b487597541996b610c7cc87",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/mobile_raid_det_nms_max_detections_40_max_labels_per_box_5_norm_coord.tflite?generation=1728509661004483"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_mobile_raid_one_stage_v2_1_uint8_tflite",
         sha256 = "2e397b750d8f270e3f41731c1ec1f5b7811f93bc3a39fb81a4c47dd5e9055915",
         urls = ["https://storage.googleapis.com/mediapipe-assets/mobile_raid_one_stage_v2_1_uint8.tflite?generation=1699635098658451"],
@@ -914,6 +968,12 @@ def external_files():
         name = "com_google_mediapipe_mozart_square_jpg",
         sha256 = "4feb4dadc5d6f853ade57b8c9d4c9a1f5ececd6469616c8e505f9a14823392b6",
         urls = ["https://storage.googleapis.com/mediapipe-assets/mozart_square.jpg?generation=1661875853838871"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_mraid_v2_2_multiclass_nms_200_40_qat_tflite",
+        sha256 = "1507a03e3c0e2567d2384b159dc17e21fb67f86c6390b10aab5d74275640ebda",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/mraid_v2_2_multiclass_nms_200_40_qat.tflite?generation=1737065441446005"],
     )
 
     http_file(
@@ -980,6 +1040,12 @@ def external_files():
         name = "com_google_mediapipe_ocr_text_jpg",
         sha256 = "88052e93aa910330433741f5cef140f8f9ec463230a332aef7038b5457b06482",
         urls = ["https://storage.googleapis.com/mediapipe-assets/ocr_text.jpg?generation=1681244241009078"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_opencv2_xcframework_zip",
+        sha256 = "6b625f564b72fd7c0946de2ae61507bed5daf84f3dbb5296ef4fef19da491160",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/opencv2.xcframework.zip?generation=1728573757773068"],
     )
 
     http_file(
@@ -1064,6 +1130,18 @@ def external_files():
         name = "com_google_mediapipe_portrait_expected_face_landmarks_pbtxt",
         sha256 = "dae959456f001015278f3a1535bd03c9fa0990a3df951135645ce23293be0613",
         urls = ["https://storage.googleapis.com/mediapipe-assets/portrait_expected_face_landmarks.pbtxt?generation=1681322486192872"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_portrait_expected_full_range_detection_pbtxt",
+        sha256 = "503ba35b747582dcfb22c6cc82afa0ba3c767332e02ec2ea17ce800cce44e1e3",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/portrait_expected_full_range_detection.pbtxt?generation=1757366816089957"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_portrait_expected_full_range_sparse_detection_pbtxt",
+        sha256 = "05ab7ed7398dbfc672d573ce50c5472cdc9522a2adf53b8ea08c13cce9d155b6",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/portrait_expected_full_range_sparse_detection.pbtxt?generation=1757366818086310"],
     )
 
     http_file(
@@ -1346,6 +1424,12 @@ def external_files():
         name = "com_google_mediapipe_ssd_mobilenet_v1_tflite",
         sha256 = "cbdecd08b44c5dea3821f77c5468e2936ecfbf43cde0795a2729fdb43401e58b",
         urls = ["https://storage.googleapis.com/mediapipe-assets/ssd_mobilenet_v1.tflite?generation=1661875947436302"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_stablelm_3b_4e1t_test_weight_safetensors",
+        sha256 = "c732deb063697cb46ad55013ed87372d57fd22b9e1cdf913a5e563601f50b7ec",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/stablelm_3b_4e1t_test_weight.safetensors?generation=1728509663906850"],
     )
 
     http_file(

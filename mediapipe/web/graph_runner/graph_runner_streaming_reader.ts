@@ -98,11 +98,31 @@ export class StreamingReader {
   ) {}
 
   /*
+   * Creates a StreamingReader from a ReadableStreamDefaultReader.
+   * @param reader The reader
+   */
+  static loadFromReader(
+    reader: ReadableStreamDefaultReader,
+    onFinished: () => void,
+  ): StreamingReader {
+    const fetchMore = async () => {
+      const {value, done} = await reader.read();
+      if (done) {
+        return undefined;
+      }
+      return value;
+    };
+    return new StreamingReader([], fetchMore, onFinished);
+  }
+
+  /*
    * Creates a StreamingReader from a URL.
    * @param url The URL to request the file.
    */
   static loadFromUrl(
-      url: string, onFinished: () => void): StreamingReader {
+    url: string,
+    onFinished: () => void,
+  ): StreamingReader {
     const readerPromise = fetch(url.toString()).then(
       (response) => response?.body?.getReader() as ReadableStreamDefaultReader,
     );
@@ -148,7 +168,13 @@ export class StreamingReader {
     if (mode === ReadMode.DISCARD_ALL) {
       this.dataArray = [];
       this.fetchMoreData = () => Promise.resolve(undefined);
-      this.onFinished();  // Signal that we're done with data
+      // Signal asynchronously that we're done with the data. This ensures that
+      // we finish the rest of our (synchronous from this point on)
+      // initialization before we resolve the data loading promise, avoiding
+      // infinite stalls in some cases.
+      setTimeout(() => {
+        this.onFinished();
+      }, 0);
       return Promise.resolve(0);
     }
 
@@ -210,9 +236,12 @@ export class StreamingReader {
    * @param array The file data.
    */
   static loadFromArray(
-      array: Uint8Array, onFinished: () => void): StreamingReader {
-    return new StreamingReader([new DiscardableDataChunk(array)], () =>
-      Promise.resolve(undefined),
+    array: Uint8Array,
+    onFinished: () => void,
+  ): StreamingReader {
+    return new StreamingReader(
+      [new DiscardableDataChunk(array)],
+      () => Promise.resolve(undefined),
       onFinished,
     );
   }

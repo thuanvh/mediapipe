@@ -33,6 +33,7 @@ index 56e45d2..37ab6e9 100644
 +#include <cstdint>
  #include <iostream>
  #include <cmath>
+ #include <limits>
  #include <string>
 diff --git a/third_party/eigen3/BUILD b/third_party/eigen3/BUILD
 index 497c1f0..de1c7f4 100644
