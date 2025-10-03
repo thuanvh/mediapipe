@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
-#include "MediapipeLibExport.h"
+#include "MdppLibExport.h"
 
-class _MEDIAPIPE_LIB_API_ ImageInferenceTflite
+class _MDPP_LIB_API_ ImageInferenceTflite
 {
 public:
   ImageInferenceTflite();

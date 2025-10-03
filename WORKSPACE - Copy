@@ -394,18 +394,13 @@ new_local_repository(
     path = "/usr/local/opt/ffmpeg",
 )
 
-# new_local_repository(
-#     name = "windows_opencv",
-#     build_file = "@//third_party:opencv_windows.BUILD",
-#     path = "C:\\Projects\\VM\\opencv-4.9.0\\install\\opencv\\build",
-#     #path = "C:\\Projects\\VM\\opencv-3.4.10\\opencv\\build",
-# )
 new_local_repository(
     name = "windows_opencv",
     build_file = "@//third_party:opencv_windows.BUILD",
     path = "D:\\Projects\\Booth\\opencv-4.9.0\\opencv\\build",
     #path = "C:\\Projects\\VM\\opencv-3.4.10\\opencv\\build",
 )
+
 http_archive(
     name = "android_opencv",
     build_file = "@//third_party:opencv_android.BUILD",

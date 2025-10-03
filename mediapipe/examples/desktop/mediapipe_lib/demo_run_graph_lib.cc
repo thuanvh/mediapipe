@@ -150,7 +150,27 @@ absl::Status RunMPPGraph() {
   return graph.WaitUntilDone();
 }
 
+absl::Status Initialize() {
+  std::string calculator_graph_config_contents;
+  MP_RETURN_IF_ERROR(mediapipe::file::GetContents(
+      absl::GetFlag(FLAGS_calculator_graph_config_file),
+      &calculator_graph_config_contents));
+  ABSL_LOG(INFO) << "Get calculator graph config contents: "
+                 << calculator_graph_config_contents;
+  mediapipe::CalculatorGraphConfig config =
+      mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(
+          calculator_graph_config_contents);
 
+  ABSL_LOG(INFO) << "Initialize the calculator graph.";
+  mediapipe::CalculatorGraph graph;
+  MP_RETURN_IF_ERROR(graph.Initialize(config));
+  
+
+  ABSL_LOG(INFO) << "Start running the calculator graph.";
+  MP_ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
+                      graph.AddOutputStreamPoller(kOutputStream));
+  MP_RETURN_IF_ERROR(graph.StartRun({}));
+}
 
 int Main::main_mpp_graph(int argc, char** argv)
 {

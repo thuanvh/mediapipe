@@ -39,7 +39,7 @@ cc_library(
 
 cc_library(
     name = "image_inference_tflite",
-    srcs = ["ImageInferenceTflite.cpp","ImageInferenceTflite.h","MediapipeLibExport.h"],
+    srcs = ["ImageInferenceTflite.cpp","ImageInferenceTflite.h","MdppLibExport.h"],
     deps = [
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/formats:image_frame",
@@ -58,9 +58,23 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ],
-    defines = ["_MEDIAPIPE_LIB_EXPORT_"],
+    defines = ["_MDPP_LIB_EXPORT_"],
 )
-
+cc_library(
+    name = "face_landmarker_lib",
+    srcs = ["ImageFaceLandmarker.cpp", "ImageFaceLandmarker.h", "FaceLandmarkerLib.cpp", "FaceLandmarkerLib.h", "MdppLibExport.h"],
+    deps = [
+        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator_proto",
+        #"//mediapipe/graphs/face_mesh:desktop_calculators",
+        "//mediapipe/examples/desktop:demo_run_graph_main",
+        "//mediapipe/graphs/face_mesh:desktop_live_calculators",
+        "//mediapipe/modules/face_landmark:face_landmark_front_cpu_image",
+    ],
+    defines = ["_MDPP_LIB_EXPORT_"],
+)
 cc_binary(
     name = "image_inference_tflite_test",
     srcs = ["ImageInferenceTfliteTest.cpp"],
@@ -68,24 +82,53 @@ cc_binary(
         "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
     ],
 )
+cc_binary(
+    name = "image_face_landmarker_app",
+    srcs = ["ImageFaceLandmarkerApp.cpp"],
+    deps = [
+        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+        "//mediapipe/examples/desktop/mediapipe_lib:face_landmarker_lib",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator_proto",
+        #"//mediapipe/graphs/face_mesh:desktop_calculators",
+        "//mediapipe/examples/desktop:demo_run_graph_main",
+        "//mediapipe/graphs/face_mesh:desktop_live_calculators",
+    ],
+)
+cc_binary(
+    name = "video_face_landmarker_app",
+    srcs = ["VideoFaceLandmarkerApp.cpp", "VideoFaceLandmarker.cpp", "VideoFaceLandmarker.h"],
+    deps = [
+        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator_proto",
+        #"//mediapipe/graphs/face_mesh:desktop_calculators",
+        "//mediapipe/examples/desktop:demo_run_graph_main",
+        "//mediapipe/graphs/face_mesh:desktop_live_calculators",
+    ],
+)
 cc_shared_library(
-    name = "mediapipe_lib_tflite",
+    name = "mdpplib_tflite",
     #data = ["//mediapipe/modules/face_landmark:face_landmark_with_attention.tflite"],
     deps = [
         "//mediapipe/examples/desktop/mediapipe_lib:simple_run_graph_lib",
         "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
         "//mediapipe/graphs/face_mesh:desktop_calculators",
+        "//mediapipe/examples/desktop/mediapipe_lib:face_landmarker_lib",
     ],
 )
 
 # CPU ONLY
 cc_shared_library(
-    name = "mediapipe_lib",
+    name = "mdpplib",
     #data = ["//mediapipe/modules/face_landmark:face_landmark_with_attention.tflite"],
     deps = [
         "//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_lib",
         "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
         "//mediapipe/graphs/face_mesh:desktop_live_calculators",
+        "//mediapipe/examples/desktop/mediapipe_lib:face_landmarker_lib",
     ],
     exports_filter = ["//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_lib",],
     #win_def_file = "win.def"
@@ -93,7 +136,7 @@ cc_shared_library(
 
 # Linux only
 cc_shared_library(
-    name = "mediapipe_lib_gpu",
+    name = "mdpplib_gpu",
     #data = ["//mediapipe/modules/face_landmark:face_landmark_with_attention.tflite"],
     deps = [
         "//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_main_lib",
