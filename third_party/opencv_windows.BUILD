@@ -23,10 +23,12 @@ config_setting(
 cc_library(
     name = "opencv",
     srcs = select({
-        ":opt_build": [
-            "x64/vc16/lib/opencv_world" + OPENCV_VERSION + ".lib",
-            "x64/vc16/bin/opencv_world" + OPENCV_VERSION + ".dll",
-        ],
+        ":opt_build": 
+        glob(["x64/vc16/lib/opencv_*430.lib","x64/vc16/bin/opencv_*430.dll"]),
+        #[
+        #    "x64/vc16/lib/opencv_world" + OPENCV_VERSION + ".lib",
+        #    "x64/vc16/bin/opencv_world" + OPENCV_VERSION + ".dll",
+        #],
         ":dbg_build": [
             "x64/vc16/lib/opencv_world" + OPENCV_VERSION + "d.lib",
             "x64/vc16/bin/opencv_world" + OPENCV_VERSION + "d.dll",
