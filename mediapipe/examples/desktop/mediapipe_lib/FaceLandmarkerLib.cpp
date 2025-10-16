@@ -2,6 +2,7 @@
 #include <vector>
 #include "MdppLibExport.h"
 #include "ImageFaceLandmarker.h"
+#include "ImageFaceBlendshapes.h"
 #include "FaceLandmarkerLib.h"
 #include <iostream>
 
@@ -17,11 +18,20 @@ using MdppFaceLandmarks = std::vector<std::vector<MdppLandmarkPoint> >;
      * @param graph_config_path Path to the .pbtxt graph file.
      * @return absl::Status::Ok() on success.
      */
-    int MdppFaceLandmarker::Initialize(const std::string& graph_config_path) {
+    int MdppFaceLandmarker::Initialize(const std::string& graph_config_path, bool with_blendshapes) {
         std::cout << "MdppFaceLandmarker::Initialize: " << graph_config_path << std::endl;
-        if (face_landmarker_ == nullptr) {
-            face_landmarker_ = new ImageFaceLandmarker();
-        }
+        
+
+
+        with_blendshapes_ = with_blendshapes;
+            if (face_landmarker_ == nullptr) {
+                if (with_blendshapes) {
+                    face_landmarker_ = new ImageFaceBlendshapes();
+                } else {
+                    face_landmarker_ = new ImageFaceLandmarker();
+                }
+            }
+        
         absl::Status status = face_landmarker_->Initialize(graph_config_path);
         std::cout << "MdppFaceLandmarker::Initialize status: " << status.message() << std::endl;
         return (int)status.code();
@@ -82,6 +92,24 @@ using MdppFaceLandmarks = std::vector<std::vector<MdppLandmarkPoint> >;
         //     LOG(ERROR) << "Error during Run: " << result.status().message();
         // }
         return mdpp_landmarks;
+    }
+
+    std::vector<MdppFaceBlendshape> MdppFaceLandmarker::GetFaceBlendshapes() {
+        if(with_blendshapes_ && face_landmarker_ != nullptr) {
+            absl::StatusOr<mediapipe::ClassificationList> result = face_landmarker_->GetFaceBlendshapes();
+            if (!result.ok()) {
+                return std::vector<MdppFaceBlendshape>();
+            }
+            std::vector<MdppFaceBlendshape> mdpp_blendshapes;
+            for (const auto& classification : result->classification()) {
+                MdppFaceBlendshape blendshape;
+                blendshape.label = classification.label();
+                blendshape.score = classification.score();
+                mdpp_blendshapes.push_back(blendshape);
+            }
+            return mdpp_blendshapes;
+        }
+        return std::vector<MdppFaceBlendshape>();
     }
 
     /**

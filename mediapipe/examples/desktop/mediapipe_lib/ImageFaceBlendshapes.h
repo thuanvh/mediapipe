@@ -9,21 +9,22 @@
 #include "mediapipe/framework/formats/landmark.pb.h"
 #include "mediapipe/framework/port/file_helpers.h"
 #include "absl/types/optional.h"
-
+#include "mediapipe/framework/formats/classification.pb.h"
 // OpenCV includes for I/O
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include "ImageLandmarkInterface.h"
+
 namespace mdpplib {
 
 // Define the expected output type for clarity
 using FaceLandmarks = std::vector<::mediapipe::NormalizedLandmarkList>;
 
-class ImageFaceLandmarker : public ImageLandmarkInterface {
+class ImageFaceBlendshapes : public ImageLandmarkInterface {
 public:
     // Constructor/Destructor
-    ImageFaceLandmarker() = default;
-    ~ImageFaceLandmarker() { 
+    ImageFaceBlendshapes() = default;
+    ~ImageFaceBlendshapes() { 
         if (graph_initialized_) {
             Dispose();
         }
@@ -44,7 +45,9 @@ public:
      */
     absl::StatusOr<FaceLandmarks> Run(const cv::Mat& input_frame, int64_t timestamp_us);
 
+    // Get face blendshapes for the last processed frame
     absl::StatusOr<mediapipe::ClassificationList> GetFaceBlendshapes();
+    
     /**
      * @brief Closes all packet sources and waits for the graph to finish.
      * @return absl::Status::Ok() on success.
@@ -58,9 +61,10 @@ private:
     // Constant stream names from the typical Face Mesh desktop graph
     static constexpr char kInputStream[] = "input_image";
     static constexpr char kLandmarksStream[] = "multi_face_landmarks";
-
+    static constexpr char kFaceBlendshapesStream[] = "face_blendshapes";
     mediapipe::CalculatorGraph graph_;
     absl::optional<mediapipe::OutputStreamPoller> poller_;
+    absl::optional<mediapipe::OutputStreamPoller> poller_face_blendshapes_;
     bool graph_initialized_ = false;
     int timeout_ms_ = 100;  // Default timeout
 };

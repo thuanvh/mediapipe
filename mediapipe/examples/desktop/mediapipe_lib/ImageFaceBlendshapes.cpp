@@ -1,4 +1,4 @@
-#include "ImageFaceLandmarker.h"
+#include "ImageFaceBlendshapes.h"
 #include "mediapipe/framework/formats/image.h"
 #include "mediapipe/framework/formats/image_opencv.h"
 using namespace mediapipe;
@@ -13,7 +13,7 @@ using FaceLandmarks = std::vector<::mediapipe::NormalizedLandmarkList>;
      * @param graph_config_path Path to the .pbtxt graph file.
      * @return absl::Status::Ok() on success.
      */
-    absl::Status ImageFaceLandmarker::Initialize(const std::string& graph_config_path) 
+    absl::Status ImageFaceBlendshapes::Initialize(const std::string& graph_config_path) 
     {
         LOG(INFO) << "Initializing MediaPipe graph...";
 
@@ -31,6 +31,10 @@ using FaceLandmarks = std::vector<::mediapipe::NormalizedLandmarkList>;
             poller_,
             graph_.AddOutputStreamPoller(kLandmarksStream));
 
+        MP_ASSIGN_OR_RETURN(
+            poller_face_blendshapes_,
+            graph_.AddOutputStreamPoller(kFaceBlendshapesStream));
+
         // 4. Start the graph
         MP_RETURN_IF_ERROR(graph_.StartRun({}));
         
@@ -45,7 +49,7 @@ using FaceLandmarks = std::vector<::mediapipe::NormalizedLandmarkList>;
      * @param timestamp_us Current frame timestamp in microseconds.
      * @return A vector of NormalizedLandmarkList, one for each detected face.
      */
-    absl::StatusOr<FaceLandmarks> ImageFaceLandmarker::Run(const cv::Mat& input_frame, int64_t timestamp_us) {
+    absl::StatusOr<FaceLandmarks> ImageFaceBlendshapes::Run(const cv::Mat& input_frame, int64_t timestamp_us) {
         if (!graph_initialized_) {
             return absl::InternalError("Graph is not initialized. Call Initialize() first.");
         }
@@ -95,11 +99,28 @@ using FaceLandmarks = std::vector<::mediapipe::NormalizedLandmarkList>;
         }
     }
 
+    absl::StatusOr<mediapipe::ClassificationList> ImageFaceBlendshapes::GetFaceBlendshapes() {
+        if (!graph_initialized_) {
+            return absl::InternalError("Graph is not initialized. Call Initialize() first.");
+        }
+
+        Packet packet;
+        if (poller_face_blendshapes_ && poller_face_blendshapes_->QueueSize() > 0 && poller_face_blendshapes_->Next(&packet)) {
+            // Success: return the face blendshapes
+            std::cout << "Received face blendshapes packet." << std::endl;
+            return packet.Get<mediapipe::ClassificationList>();
+        } else {
+            // This happens if the graph stalls or is closed.
+            std::cout << "No face blendshapes packet received." << std::endl;
+            return mediapipe::ClassificationList{};
+        }
+    }
+
     /**
      * @brief Closes all packet sources and waits for the graph to finish.
      * @return absl::Status::Ok() on success.
      */
-    absl::Status ImageFaceLandmarker::Dispose() {
+    absl::Status ImageFaceBlendshapes::Dispose() {
         if (!graph_initialized_) return absl::OkStatus();
 
         LOG(INFO) << "Stopping MediaPipe graph...";
@@ -113,7 +134,5 @@ using FaceLandmarks = std::vector<::mediapipe::NormalizedLandmarkList>;
         return wait_status;
     }
 
-    absl::StatusOr<mediapipe::ClassificationList> ImageFaceLandmarker::GetFaceBlendshapes(){
-        return absl::InternalError("GetFaceBlendshapes not implemented in ImageFaceLandmarker.");
-    }
+
 } // namespace mediapipe

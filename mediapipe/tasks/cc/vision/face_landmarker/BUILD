@@ -63,6 +63,7 @@ cc_library(
         "//mediapipe/tasks/cc/vision/face_landmarker/proto:face_blendshapes_graph_options_cc_proto",
     ],
     alwayslink = 1,
+    visibility = ["//visibility:public"],
 )
 
 cc_library(

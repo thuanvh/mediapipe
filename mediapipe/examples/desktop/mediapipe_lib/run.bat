@@ -22,6 +22,7 @@ set PATH=%PATH%;d:\Projects\Booth\bazelisk\;
 
 bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_lib:mediapipe_lib --experimental_cc_shared_library
 bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_lib:mdpplib --experimental_cc_shared_library
+bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_lib:image_face_blendshapes_app --experimental_cc_shared_library
 bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/face_mesh:face_mesh_cpu --experimental_cc_shared_library
 
 bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/modules/face_landmark:face_landmark_with_attention.tflite  --experimental_cc_shared_library

@@ -62,7 +62,11 @@ cc_library(
 )
 cc_library(
     name = "face_landmarker_lib",
-    srcs = ["ImageFaceLandmarker.cpp", "ImageFaceLandmarker.h", "FaceLandmarkerLib.cpp", "FaceLandmarkerLib.h", "MdppLibExport.h"],
+    srcs = ["ImageFaceLandmarker.cpp", 
+            "ImageFaceLandmarker.h", 
+            "ImageLandmarkInterface.h", 
+            "FaceLandmarkerLib.cpp", 
+            "FaceLandmarkerLib.h", "MdppLibExport.h", "ImageFaceBlendshapes.h"],
     deps = [
         "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
         "//mediapipe/framework/formats:landmark_cc_proto",
@@ -72,6 +76,31 @@ cc_library(
         "//mediapipe/examples/desktop:demo_run_graph_main",
         "//mediapipe/graphs/face_mesh:desktop_live_calculators",
         "//mediapipe/modules/face_landmark:face_landmark_front_cpu_image",
+    ],
+    defines = ["_MDPP_LIB_EXPORT_"],
+)
+cc_library(
+    name = "face_blendshapes_lib",
+    srcs = ["ImageFaceBlendshapes.cpp", 
+            "ImageFaceBlendshapes.h", 
+            "ImageFaceLandmarker.cpp", 
+            "ImageFaceLandmarker.h", 
+            "FaceLandmarkerLib.cpp",
+            "FaceLandmarkerLib.h",
+            "ImageLandmarkInterface.h",
+            "MdppLibExport.h",
+            "VectorToNormalizedLandmarkListCalculator.cc"],
+    deps = [
+        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator_proto",
+        #"//mediapipe/graphs/face_mesh:desktop_calculators",
+        "//mediapipe/examples/desktop:demo_run_graph_main",
+        "//mediapipe/graphs/face_mesh:desktop_live_calculators",
+        "//mediapipe/modules/face_landmark:face_landmark_front_cpu_image",
+        "//mediapipe/tasks/cc/vision/face_landmarker:face_blendshapes_graph", 
+        #":vector_to_landmark_calc",
     ],
     defines = ["_MDPP_LIB_EXPORT_"],
 )
@@ -94,6 +123,30 @@ cc_binary(
         #"//mediapipe/graphs/face_mesh:desktop_calculators",
         "//mediapipe/examples/desktop:demo_run_graph_main",
         "//mediapipe/graphs/face_mesh:desktop_live_calculators",
+    ],
+)
+cc_library(
+  name = "vector_to_landmark_calc",
+  srcs = ["VectorToNormalizedLandmarkListCalculator.cc"],
+  deps = [
+    "//mediapipe/framework:calculator_framework",
+    "//mediapipe/framework/formats:landmark_cc_proto",
+  ],
+)
+cc_binary(
+    name = "image_face_blendshapes_app",
+    srcs = ["ImageFaceBlendshapesApp.cpp"],
+    deps = [
+        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+        "//mediapipe/examples/desktop/mediapipe_lib:face_blendshapes_lib",
+        #":vector_to_landmark_calc",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator",
+        #"//mediapipe/calculators/core:constant_side_packet_calculator_proto",
+        #"//mediapipe/graphs/face_mesh:desktop_calculators",
+        "//mediapipe/examples/desktop:demo_run_graph_main",
+        "//mediapipe/graphs/face_mesh:desktop_live_calculators",
+        "//mediapipe/tasks/cc/vision/face_landmarker:face_blendshapes_graph", 
     ],
 )
 cc_binary(
@@ -128,7 +181,8 @@ cc_shared_library(
         "//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_lib",
         "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
         "//mediapipe/graphs/face_mesh:desktop_live_calculators",
-        "//mediapipe/examples/desktop/mediapipe_lib:face_landmarker_lib",
+        #"//mediapipe/examples/desktop/mediapipe_lib:face_landmarker_lib",
+        "//mediapipe/examples/desktop/mediapipe_lib:face_blendshapes_lib",
     ],
     exports_filter = ["//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_lib",],
     #win_def_file = "win.def"
