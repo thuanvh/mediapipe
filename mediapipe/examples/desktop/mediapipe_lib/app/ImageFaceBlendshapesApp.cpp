@@ -9,12 +9,13 @@
 #include "mediapipe/framework/formats/landmark.pb.h"
 #include "mediapipe/framework/port/file_helpers.h"
 #include "absl/types/optional.h"
+#include "mediapipe/framework/formats/classification.pb.h"
 
 // OpenCV includes for I/O
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <fstream>
-#include "ImageFaceLandmarker.h"
+#include "ImageFaceBlendshapes.h"
 //namespace mediapipe {
 
 // // Define the expected output type for clarity
@@ -147,9 +148,9 @@ int main(int argc, char** argv) {
 
     // **IMPORTANT**: In a real build, you must have this file available 
     // and the path must be correct relative to your Bazel workspace.
-    const std::string kGraphPath = "mediapipe/graphs/face_mesh/face_mesh_desktop_image.pbtxt";
+    const std::string kGraphPath = "mediapipe/graphs/face_mesh/face_mesh_desktop_image_blendshapes.pbtxt";
     
-    mdpplib::ImageFaceLandmarker landmarker;
+    mdpplib::ImageFaceBlendshapes landmarker;
     absl::Status init_status = landmarker.Initialize(kGraphPath);
 
     if (!init_status.ok()) {
@@ -185,8 +186,11 @@ int main(int argc, char** argv) {
         //int64_t timestamp_us = 1;//frame_count * 1000 * 1000 / 30; // Mock 30 FPS timestamp
         int64_t timestamp_us = std::chrono::duration_cast<std::chrono::microseconds>(
              std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+        cv::Mat rgb_frame;
+        cv::cvtColor(frame_resized, rgb_frame, cv::COLOR_BGR2RGB);
+
         // Run detection
-        absl::StatusOr<mdpplib::FaceLandmarks> result = landmarker.Run(frame_resized, timestamp_us);
+        absl::StatusOr<mdpplib::FaceLandmarks> result = landmarker.Run(rgb_frame.data, rgb_frame.cols, rgb_frame.rows, timestamp_us);
 
         if (result.ok()) {
             const auto& face_landmarks = result.value();
@@ -200,6 +204,18 @@ int main(int argc, char** argv) {
                     int y = static_cast<int>(landmark.y() * frame_resized.rows);
                     cv::circle(frame_resized, cv::Point(x, y), 1, cv::Scalar(0, 255, 0), -1);
                 }
+            }
+
+            // Get blendshapes
+            absl::StatusOr<mediapipe::ClassificationList> blendshapes_result = landmarker.GetFaceBlendshapes();
+            if (blendshapes_result.ok()) {
+                const auto& blendshapes = blendshapes_result.value();
+                std::cout << "Blendshapes:" << std::endl;
+                for (const auto& classification : blendshapes.classification()) {
+                    std::cout << "  " << classification.label() << ": " << classification.score() << std::endl;
+                }
+            } else {
+                LOG(ERROR) << "Error getting blendshapes: " << blendshapes_result.status().message();
             }
         } else {
             LOG(ERROR) << "Error during Run: " << result.status().message();

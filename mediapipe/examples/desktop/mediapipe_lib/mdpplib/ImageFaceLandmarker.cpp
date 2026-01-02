@@ -1,6 +1,8 @@
 #include "ImageFaceLandmarker.h"
 #include "mediapipe/framework/formats/image.h"
-#include "mediapipe/framework/formats/image_opencv.h"
+#include "mediapipe/framework/formats/image_frame.h"
+#include <iostream>
+#include <cstring>
 using namespace mediapipe;
 namespace mdpplib {
 
@@ -41,38 +43,31 @@ using FaceLandmarks = std::vector<::mediapipe::NormalizedLandmarkList>;
 
     /**
      * @brief Processes a single video frame and returns face landmarks.
-     * @param input_frame The input frame (OpenCV Mat, expected to be BGR).
+     * @param pixel_data The input frame buffer (RGB).
+     * @param width Frame width.
+     * @param height Frame height.
      * @param timestamp_us Current frame timestamp in microseconds.
      * @return A vector of NormalizedLandmarkList, one for each detected face.
      */
-    absl::StatusOr<FaceLandmarks> ImageFaceLandmarker::Run(const cv::Mat& input_frame, int64_t timestamp_us) {
+    absl::StatusOr<FaceLandmarks> ImageFaceLandmarker::Run(const uint8_t* pixel_data, int width, int height, int64_t timestamp_us) {
         if (!graph_initialized_) {
             return absl::InternalError("Graph is not initialized. Call Initialize() first.");
         }
-        //if (poller_)
-        //    poller_->Reset();
-        // 1. Convert OpenCV Mat to MediaPipe ImageFrame
-        // MediaPipe usually expects RGB, so convert BGR to RGB
-        std::cout << "Input frame size: " << input_frame.cols << "x" << input_frame.rows << " Channels: " << input_frame.channels() << std::endl;
-        cv::Mat rgb_frame;
-        cv::cvtColor(input_frame, rgb_frame, cv::COLOR_BGR2RGB);
+        
+        std::cout << "Input frame size: " << width << "x" << height << " (RGB)" << std::endl;
 
         auto mp_frame = absl::make_unique<ImageFrame>(
-            ImageFormat::SRGB, rgb_frame.cols, rgb_frame.rows, 
+            ImageFormat::SRGB, width, height,
             ImageFrame::kDefaultAlignmentBoundary);
-        cv::Mat wrapped_mat = formats::MatView(mp_frame.get());
-        rgb_frame.copyTo(wrapped_mat);
+        
+        std::memcpy(mp_frame->MutablePixelData(), pixel_data, width * height * 3);
 
         auto mp_frame_shared = std::shared_ptr<mediapipe::ImageFrame>(mp_frame.release());
         ::mediapipe::Image mp_image(mp_frame_shared);
 
         std::cout << "Converted to ImageFrame." << std::endl;
         std::cout << "Timestamp (us): " << timestamp_us << std::endl;
-        // 2. Send the packet to the graph
-        // MP_RETURN_IF_ERROR(graph_.AddPacketToInputStream(
-        //     kInputStream, 
-        //     Adopt(mp_frame.release())
-        //         .At(Timestamp(timestamp_us))));
+
         MP_RETURN_IF_ERROR(graph_.AddPacketToInputStream(
             kInputStream,
             MakePacket<::mediapipe::Image>(mp_image).At(Timestamp(timestamp_us))));

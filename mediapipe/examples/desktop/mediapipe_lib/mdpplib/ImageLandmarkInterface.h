@@ -8,7 +8,7 @@
 #include "MdppLibExport.h"
 #include "mediapipe/framework/formats/landmark.pb.h"
 #include "mediapipe/framework/formats/classification.pb.h"
-#include <opencv2/opencv.hpp>
+#include <cstdint>
 namespace mdpplib {
 // Define the expected output type for clarity
 using FaceLandmarks = std::vector<::mediapipe::NormalizedLandmarkList>;
@@ -19,7 +19,7 @@ class ImageLandmarkInterface {
 public:
     virtual ~ImageLandmarkInterface() = default;
     virtual absl::Status Initialize(const std::string& graph_config_path) = 0;
-    virtual absl::StatusOr<FaceLandmarks> Run(const cv::Mat& input_frame, int64_t timestamp_us) = 0;
+    virtual absl::StatusOr<FaceLandmarks> Run(const uint8_t* pixel_data, int width, int height, int64_t timestamp_us) = 0;
     virtual absl::StatusOr<mediapipe::ClassificationList> GetFaceBlendshapes() = 0;
     virtual absl::Status Dispose() = 0;
     virtual void SetTimeOut(int timeout_ms) = 0;

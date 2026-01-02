@@ -69,13 +69,11 @@ cc_library(
             "FaceLandmarkerLib.h", "MdppLibExport.h", "ImageFaceBlendshapes.h"],
     deps = [
         "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:classification_cc_proto",
         "//mediapipe/framework/formats:landmark_cc_proto",
-        #"//mediapipe/calculators/core:constant_side_packet_calculator",
-        #"//mediapipe/calculators/core:constant_side_packet_calculator_proto",
-        #"//mediapipe/graphs/face_mesh:desktop_calculators",
-        "//mediapipe/examples/desktop:demo_run_graph_main",
-        "//mediapipe/graphs/face_mesh:desktop_live_calculators",
-        "//mediapipe/modules/face_landmark:face_landmark_front_cpu_image",
+        "//mediapipe/framework/formats:image",
+        "//mediapipe/framework/formats:image_frame",
     ],
     defines = ["_MDPP_LIB_EXPORT_"],
 )
@@ -89,17 +87,24 @@ cc_library(
             "FaceLandmarkerLib.h",
             "ImageLandmarkInterface.h",
             "MdppLibExport.h",
+            "MdppShim.cpp",
+            "MdppShim.h",
             "VectorToNormalizedLandmarkListCalculator.cc"],
     deps = [
-        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+        #"//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:classification_cc_proto",
         "//mediapipe/framework/formats:landmark_cc_proto",
         #"//mediapipe/calculators/core:constant_side_packet_calculator",
         #"//mediapipe/calculators/core:constant_side_packet_calculator_proto",
         #"//mediapipe/graphs/face_mesh:desktop_calculators",
-        "//mediapipe/examples/desktop:demo_run_graph_main",
-        "//mediapipe/graphs/face_mesh:desktop_live_calculators",
-        "//mediapipe/modules/face_landmark:face_landmark_front_cpu_image",
-        "//mediapipe/tasks/cc/vision/face_landmarker:face_blendshapes_graph", 
+        #"//mediapipe/examples/desktop:demo_run_graph_main",
+        #"//mediapipe/graphs/face_mesh:desktop_live_calculators",
+        #"//mediapipe/modules/face_landmark:face_landmark_front_cpu_image",
+        #"//mediapipe/tasks/cc/vision/face_landmarker:face_blendshapes_graph", 
+        "//mediapipe/framework/formats:image",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/port:parse_text_proto",
         #":vector_to_landmark_calc",
     ],
     defines = ["_MDPP_LIB_EXPORT_"],
@@ -177,15 +182,9 @@ cc_shared_library(
 cc_shared_library(
     name = "mdpplib",
     #data = ["//mediapipe/modules/face_landmark:face_landmark_with_attention.tflite"],
-    deps = [
-        "//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_lib",
-        "//mediapipe/examples/desktop/mediapipe_lib:image_inference_tflite",
-        "//mediapipe/graphs/face_mesh:desktop_live_calculators",
-        #"//mediapipe/examples/desktop/mediapipe_lib:face_landmarker_lib",
-        "//mediapipe/examples/desktop/mediapipe_lib:face_blendshapes_lib",
-    ],
-    exports_filter = ["//mediapipe/examples/desktop/mediapipe_lib:demo_run_graph_lib",],
-    #win_def_file = "win.def"
+    deps = [        
+        "//mediapipe/examples/desktop/mediapipe_lib/mdpplib:face_blendshapes_lib",
+    ],    
 )
 
 # Linux only

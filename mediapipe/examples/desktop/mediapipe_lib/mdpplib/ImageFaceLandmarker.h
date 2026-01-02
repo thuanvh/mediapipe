@@ -3,7 +3,7 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 #include "mediapipe/framework/formats/image_frame.h"
-#include "mediapipe/framework/formats/image_frame_opencv.h"
+// #include "mediapipe/framework/formats/image_frame_opencv.h"
 // #include "mediapipe/framework/port/opencv_imgcodecs.h"
 // #include "mediapipe/framework/port/opencv_video_inc.h"
 #include "mediapipe/framework/formats/landmark.pb.h"
@@ -11,7 +11,7 @@
 #include "absl/types/optional.h"
 
 // OpenCV includes for I/O
-#include <opencv2/opencv.hpp>
+#include <cstdint>
 #include <vector>
 #include "ImageLandmarkInterface.h"
 namespace mdpplib {
@@ -42,7 +42,7 @@ public:
      * @param timestamp_us Current frame timestamp in microseconds.
      * @return A vector of NormalizedLandmarkList, one for each detected face.
      */
-    absl::StatusOr<FaceLandmarks> Run(const cv::Mat& input_frame, int64_t timestamp_us);
+    absl::StatusOr<FaceLandmarks> Run(const uint8_t* pixel_data, int width, int height, int64_t timestamp_us) override;
 
     absl::StatusOr<mediapipe::ClassificationList> GetFaceBlendshapes();
     /**

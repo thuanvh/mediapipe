@@ -5,6 +5,7 @@
 #include "ImageFaceBlendshapes.h"
 #include "FaceLandmarkerLib.h"
 #include <iostream>
+#include <chrono>
 
 namespace mdpplib {
 
@@ -49,15 +50,12 @@ using MdppFaceLandmarks = std::vector<std::vector<MdppLandmarkPoint> >;
             return MdppFaceLandmarks();
         }
 
-        // 1. Convert input data to OpenCV Mat
-        cv::Mat input_frame(height, width, (channel == 3) ? CV_8UC3 : CV_8UC4, (void*)input_frame_data);
-        
         // Get current time in microseconds
         int64_t timestamp_us = std::chrono::duration_cast<std::chrono::microseconds>(
              std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-        //int64_t timestamp_us =  //0;//frame_count * 1000 * 1000 / 30; // Mock 30 FPS timestamp
+
         // 2. Run the face landmarker
-        absl::StatusOr<FaceLandmarks> result = face_landmarker_->Run(input_frame, timestamp_us);
+        absl::StatusOr<FaceLandmarks> result = face_landmarker_->Run(input_frame_data, width, height, timestamp_us);
         if (!result.ok()) {
             return MdppFaceLandmarks();
         }
