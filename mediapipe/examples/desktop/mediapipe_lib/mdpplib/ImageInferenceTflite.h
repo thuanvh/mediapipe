@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <cstdint>
+#include <string>
 #include "MdppLibExport.h"
 
 class _MDPP_LIB_API_ ImageInferenceTflite
@@ -13,9 +15,9 @@ public:
    */
   void SetMode(int mode);
   void SetDevice(int device);
-  //std::vector<float> Regression(const cv::Mat& src, const std::vector<float>& values);
-  std::vector<float> Inference(const cv::Mat& src, bool use_scale = true, float scale = 1 / 255.0f);
-  int Predict(const cv::Mat& src, bool use_scale, float scale, std::vector<float>& prob);
+  //std::vector<float> Regression(const uint8_t* pixel_data, int width, int height, const std::vector<float>& values);
+  std::vector<float> Inference(const uint8_t* pixel_data, int width, int height, bool use_scale = true, float scale = 1 / 255.0f);
+  int Predict(const uint8_t* pixel_data, int width, int height, bool use_scale, float scale, std::vector<float>& prob);
   void DumpModel();
   /*static void Train(const std::string& netconfig, const std::string& netresult = NULL, bool finetune_net = false);
   void InitNet(const std::string& input);

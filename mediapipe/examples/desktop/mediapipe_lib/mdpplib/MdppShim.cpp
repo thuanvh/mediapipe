@@ -1,5 +1,6 @@
 #include "MdppShim.h"
 #include "FaceLandmarkerLib.h"
+#include "ImageInferenceTflite.h"
 #include <string.h>
 #include <iostream>
 
@@ -91,6 +92,50 @@ void Mdpp_FreeBlendshapes(MdppBlendshapeResultC result) {
 void Mdpp_SetTimeOut(void* handle, int timeout_ms) {
     if (handle) {
         static_cast<mdpplib::MdppFaceLandmarker*>(handle)->SetTimeOut(timeout_ms);
+    }
+}
+
+// ImageInferenceTflite
+void* Mdpp_CreateImageInference() {
+    return new ImageInferenceTflite();
+}
+
+void Mdpp_DestroyImageInference(void* handle) {
+    if (handle) {
+        delete static_cast<ImageInferenceTflite*>(handle);
+    }
+}
+
+void Mdpp_LoadNet(void* handle, const char* filename, const char* input_layer, const char* output_layer) {
+    if (handle && filename) {
+        static_cast<ImageInferenceTflite*>(handle)->LoadNet(filename, input_layer ? input_layer : "", output_layer ? output_layer : "");
+    }
+}
+
+int Mdpp_Inference(void* handle, const unsigned char* pixel_data, int width, int height, int use_scale, float scale, float* output_data, int* output_size) {
+    if (!handle || !pixel_data || !output_data || !output_size) return -1;
+    try {
+        auto result = static_cast<ImageInferenceTflite*>(handle)->Inference(pixel_data, width, height, use_scale != 0, scale);
+        *output_size = (int)result.size();
+        std::copy(result.begin(), result.end(), output_data);
+        return 0;
+    } catch (...) {
+        return -1;
+    }
+}
+
+int Mdpp_Predict(void* handle, const unsigned char* pixel_data, int width, int height, int use_scale, float scale, float* prob_data, int* prob_size) {
+    if (!handle || !pixel_data || !prob_data || !prob_size) return -1;
+    try {
+        std::vector<float> prob;
+        int status = static_cast<ImageInferenceTflite*>(handle)->Predict(pixel_data, width, height, use_scale != 0, scale, prob);
+        if (status == 0) {
+            *prob_size = (int)prob.size();
+            std::copy(prob.begin(), prob.end(), prob_data);
+        }
+        return status;
+    } catch (...) {
+        return -1;
     }
 }
 

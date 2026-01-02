@@ -39,6 +39,13 @@ _MDPP_LIB_API_ MdppBlendshapeResultC Mdpp_GetBlendshapes(void* handle);
 _MDPP_LIB_API_ void Mdpp_FreeBlendshapes(MdppBlendshapeResultC result);
 _MDPP_LIB_API_ void Mdpp_SetTimeOut(void* handle, int timeout_ms);
 
+// ImageInferenceTflite
+_MDPP_LIB_API_ void* Mdpp_CreateImageInference();
+_MDPP_LIB_API_ void Mdpp_DestroyImageInference(void* handle);
+_MDPP_LIB_API_ void Mdpp_LoadNet(void* handle, const char* filename, const char* input_layer, const char* output_layer);
+_MDPP_LIB_API_ int Mdpp_Inference(void* handle, const unsigned char* pixel_data, int width, int height, int use_scale, float scale, float* output_data, int* output_size);
+_MDPP_LIB_API_ int Mdpp_Predict(void* handle, const unsigned char* pixel_data, int width, int height, int use_scale, float scale, float* prob_data, int* prob_size);
+
 #ifdef __cplusplus
 }
 #endif
