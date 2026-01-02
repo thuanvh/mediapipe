@@ -7,7 +7,7 @@ set PATH=%PATH%;d:\Projects\Booth\bazelisk\;
 
 cd d:\Projects\Booth\mediapipe\
 
-bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/mediapipe_lib/mdpplib:mdpplib --experimental_cc_shared_library
+bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1  mediapipe/examples/desktop/mediapipe_lib/mdpplib:mdpplib --experimental_cc_shared_library
 
 DIR D:\Projects\Booth\mediapipe\bazel-bin\mediapipe\examples\desktop\mediapipe_lib\mdpplib\mdpplib.dll
 cp D:\Projects\Booth\mediapipe\bazel-bin\mediapipe\examples\desktop\mediapipe_lib\mdpplib\mdpplib.dll D:\Projects\Booth\VMRS\Sources\target\debug\
