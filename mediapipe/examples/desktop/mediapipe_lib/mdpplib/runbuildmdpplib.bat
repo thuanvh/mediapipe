@@ -11,3 +11,6 @@ bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1  mediapipe/examples/desktop/
 
 DIR D:\Projects\Booth\mediapipe\bazel-bin\mediapipe\examples\desktop\mediapipe_lib\mdpplib\mdpplib.dll
 cp D:\Projects\Booth\mediapipe\bazel-bin\mediapipe\examples\desktop\mediapipe_lib\mdpplib\mdpplib.dll D:\Projects\Booth\VMRS\Sources\target\debug\
+cp D:\Projects\Booth\mediapipe\bazel-bin\mediapipe\examples\desktop\mediapipe_lib\mdpplib\mdpplib.dll D:\Projects\Booth\VMRS\Sources\resources\bin\
+
+cp D:\Projects\Booth\mediapipe\bazel-bin\mediapipe\examples\desktop\mediapipe_lib\mdpplib\*.* D:\Projects\Booth\VMRS\Sources\resources\lib\
