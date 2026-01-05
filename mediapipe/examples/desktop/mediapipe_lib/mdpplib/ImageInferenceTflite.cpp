@@ -53,7 +53,7 @@ ImageInferenceTflite::~ImageInferenceTflite(void)
 }
 
 bool run_predict_impl(const uint8_t* pixel_data, int width, int height, std::unique_ptr<tflite::FlatBufferModel>& model, std::vector<float>& pvec,
-  const std::string& input_layer, const std::string& output_layer, bool use_scale, float scale) {
+  const std::string& input_layer, const std::string& output_layer, bool use_scale, float scale, float subtract) {
   
   const int wanted_width = width;
   const int wanted_height = height;
@@ -73,9 +73,9 @@ bool run_predict_impl(const uint8_t* pixel_data, int width, int height, std::uni
   int num_pixels = wanted_width * wanted_height * wanted_channels;
   for (int i = 0; i < num_pixels; ++i) {
       if (use_scale) {
-          input[i] = (float)pixel_data[i] * scale;
+          input[i] = ((float)pixel_data[i] - subtract) * scale;
       } else {
-          input[i] = (float)pixel_data[i];
+          input[i] = ((float)pixel_data[i] - subtract);
       }
   }
 
@@ -99,19 +99,19 @@ bool run_predict_impl(const uint8_t* pixel_data, int width, int height, std::uni
 }
 
 
-std::vector<float> ImageInferenceTflite::Inference(const uint8_t* pixel_data, int width, int height, bool use_scale, float scale)
+std::vector<float> ImageInferenceTflite::Inference(const uint8_t* pixel_data, int width, int height, bool use_scale, float scale, float subtract)
 {
   std::vector<float> value;
   std::unique_ptr<tflite::FlatBufferModel> ptr((tflite::FlatBufferModel*)m_Session);
-  run_predict_impl(pixel_data, width, height, ptr, value, input_layer, output_layer, use_scale, scale);
+  run_predict_impl(pixel_data, width, height, ptr, value, input_layer, output_layer, use_scale, scale, subtract);
   m_Session = ptr.release();
   return value;
 }
 
-int ImageInferenceTflite::Predict(const uint8_t* pixel_data, int width, int height, bool use_scale, float scale, std::vector<float>& prob)
+int ImageInferenceTflite::Predict(const uint8_t* pixel_data, int width, int height, bool use_scale, float scale, float subtract, std::vector<float>& prob)
 {
   std::unique_ptr<tflite::FlatBufferModel> ptr((tflite::FlatBufferModel*)m_Session);
-  bool success = run_predict_impl(pixel_data, width, height, ptr, prob, input_layer, output_layer, use_scale, scale);
+  bool success = run_predict_impl(pixel_data, width, height, ptr, prob, input_layer, output_layer, use_scale, scale, subtract);
   m_Session = ptr.release();
   return success ? 0 : -1;
 }

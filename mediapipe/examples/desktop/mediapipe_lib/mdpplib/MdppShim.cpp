@@ -112,10 +112,10 @@ void Mdpp_LoadNet(void* handle, const char* filename, const char* input_layer, c
     }
 }
 
-int Mdpp_Inference(void* handle, const unsigned char* pixel_data, int width, int height, int use_scale, float scale, float* output_data, int* output_size) {
+int Mdpp_Inference(void* handle, const unsigned char* pixel_data, int width, int height, int use_scale, float scale, float subtract, float* output_data, int* output_size) {
     if (!handle || !pixel_data || !output_data || !output_size) return -1;
     try {
-        auto result = static_cast<ImageInferenceTflite*>(handle)->Inference(pixel_data, width, height, use_scale != 0, scale);
+        auto result = static_cast<ImageInferenceTflite*>(handle)->Inference(pixel_data, width, height, use_scale != 0, scale, subtract);
         *output_size = (int)result.size();
         std::copy(result.begin(), result.end(), output_data);
         return 0;
@@ -124,11 +124,11 @@ int Mdpp_Inference(void* handle, const unsigned char* pixel_data, int width, int
     }
 }
 
-int Mdpp_Predict(void* handle, const unsigned char* pixel_data, int width, int height, int use_scale, float scale, float* prob_data, int* prob_size) {
+int Mdpp_Predict(void* handle, const unsigned char* pixel_data, int width, int height, int use_scale, float scale, float subtract, float* prob_data, int* prob_size) {
     if (!handle || !pixel_data || !prob_data || !prob_size) return -1;
     try {
         std::vector<float> prob;
-        int status = static_cast<ImageInferenceTflite*>(handle)->Predict(pixel_data, width, height, use_scale != 0, scale, prob);
+        int status = static_cast<ImageInferenceTflite*>(handle)->Predict(pixel_data, width, height, use_scale != 0, scale, subtract, prob);
         if (status == 0) {
             *prob_size = (int)prob.size();
             std::copy(prob.begin(), prob.end(), prob_data);
